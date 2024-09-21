@@ -4,6 +4,7 @@ const initialState = {
   token: null,
   user: null,
   error: null,
+  serviceProviderId:null,
 };
 
 export const authReducer = (state = initialState, action) => {
@@ -13,6 +14,7 @@ export const authReducer = (state = initialState, action) => {
         ...state,
         token: action.payload.token,
         user: action.payload.user,
+        serviceProviderId: action.payload.serviceProviderId,
         error: null,
       };
     case LOGIN_FAILURE:
@@ -25,6 +27,7 @@ export const authReducer = (state = initialState, action) => {
         ...state,
         token: null,
         user: null,
+        serviceProviderId: null,
       };
     default:
       return state;

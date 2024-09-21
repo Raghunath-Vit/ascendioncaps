@@ -6,12 +6,13 @@ const serviceRoutes = require('./routes/Services');
 const bookingRoutes = require('./routes/Bookings');
 const authRoutes = require('./routes/auth');
 const categoryRoutes = require('./routes/categories');
+const serviceProviderRoutes = require('./routes/ServiceProvidersRoutes');
 const session = require('express-session');
 const passport = require('passport');
 const passportConfig = require('./config/passport');
 const https = require('https');
 const agent = new https.Agent({ rejectUnauthorized: false });
-const reviewsRoutes=require('./routes/Reviews');
+
 
 
 dotenv.config();
@@ -45,9 +46,11 @@ app.use('/auth', authRoutes);
 app.use('/api', categoryRoutes);
 app.use('/apis', serviceRoutes);
 app.use('/api/bookings', bookingRoutes);
-app.use('/review', reviewsRoutes);
+app.use('/providers',serviceProviderRoutes);
+
 
 
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+

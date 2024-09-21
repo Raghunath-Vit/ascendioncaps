@@ -16,6 +16,7 @@ export const loginUser = (email, password) => async (dispatch) => {
       payload: {
         token,
         user: decodedToken,
+        serviceProviderId: decodedToken.serviceProviderId || null,
       },
     });
 

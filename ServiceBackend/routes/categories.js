@@ -1,38 +1,3 @@
-// // routes/categories.js
-// const express = require('express');
-// const router = express.Router();
-// const Category = require('../models/Category');
-// const authenticateJWT = require('../middlewares/auth');
-
-// // Create a new Category (Worker or Admin only)
-// router.post('/categories', authenticateJWT, async (req, res) => {
-//     if (req.user.role !== 'worker' && req.user.role !== 'admin') {
-//         return res.status(403).json({ message: 'Access denied. Only workers and admins can create categories.' });
-//     }
-
-//     const { name, description } = req.body;
-//     try {
-//         const category = new Category({ name, description });
-//         await category.save();
-
-//         res.status(201).json({ message: 'Category created successfully', category });
-//     } catch (err) {
-//         res.status(500).json({ message: err.message });
-//     }
-// });
-
-// // Fetch all Categories
-// router.get('/categories', async (req, res) => {
-//     try {
-//         const categories = await Category.find(); // Fetch all categories from the DB
-//         res.status(200).json(categories);
-//     } catch (err) {
-//         res.status(500).json({ message: err.message });
-//     }
-// });
-
-// module.exports = router;
-
 
 const express = require('express');
 const { body, validationResult } = require('express-validator');
@@ -59,7 +24,7 @@ router.post('/categories',
             .escape(),
     ],
     async (req, res) => {
-        if (req.user.role !== 'worker' && req.user.role !== 'admin') {
+        if (req.user.role !== 'admin') {
             return res.status(403).json({ message: 'Access denied. Only workers and admins can create categories.' });
         }
 

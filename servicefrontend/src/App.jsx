@@ -1,7 +1,7 @@
 import  { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { decodeToken } from './utils/jwtDecode';
-import {  Routes, Route, useLocation} from 'react-router-dom';
+import {  Routes, Route} from 'react-router-dom';
 import { LOGIN_SUCCESS } from './redux/actions';
 import Admin from './components/Admin';
 import Worker from './components/Worker';
@@ -12,9 +12,14 @@ import CreateCategory from './components/CreateCategory';
 import CreateService from './components/CreateService';
 import ViewUsers from './components/ViewUsers';
 import Works from './components/Works';
+import AddService from './components/AddService';
+import Booking from './components/booking';
+import MyBooking from './components/MyBooking';
+import VerifyWork from './components/VerifyWork';
+import OtpEnter from './components/OtpEnter';
+import GiveRating from './components/GiveRating';
 
 const App = () => {
-  const location = useLocation();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -33,7 +38,7 @@ const App = () => {
 
   return (
     <>
-    {location.pathname !== '/login' && <Navbar />}
+    <Navbar/>
    
       <Routes>
         <Route path="/login" element={<Login />} />
@@ -42,8 +47,14 @@ const App = () => {
         <Route path="/user" element={<User />} />
         <Route path="/create-category" element={<CreateCategory />} />
         <Route path="/create-service" element={<CreateService />} />
+        <Route path="/add-service/:id" element={<AddService/>} />
         <Route path="/view-users" element={<ViewUsers />} />
         <Route path="/works" element={<Works />} />
+        <Route path="/booknow/:id" element={<Booking/>} />
+        <Route path="/mybooking/:id" element={<MyBooking/>} />
+        <Route path="/verifywork/:id" element={<VerifyWork/>} />
+        <Route path='/otpverify/:id' element={<OtpEnter/>} />
+        <Route path='/:id/giverating' element={<GiveRating/>} /> 
       </Routes>
 
     </>

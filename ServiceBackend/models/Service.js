@@ -6,11 +6,10 @@ const serviceSchema = new mongoose.Schema({
     ref: 'Category',
     required: true
   },
-  serviceProviderId: {
+  serviceProviderId: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User', 
-    required: true
-  },
+  }],
   serviceProviderEmail: {
     type: String,  // You must ensure this field exists to search by email
     // required: true
@@ -29,13 +28,22 @@ const serviceSchema = new mongoose.Schema({
   numberOfRatings: { type: Number, default: 0 }, // Count of ratings
 });
 
+// serviceSchema.methods.updateAverageRating = async function (newRating) {
+//   this.totalRatingScore += newRating;
+//   this.numberOfRatings += 1;
+//   this.rating = this.totalRatingScore / this.numberOfRatings;
+//   await this.save();
+// };
+
+// In your Service model
 serviceSchema.methods.updateAverageRating = async function (newRating) {
-  this.totalRatingScore += newRating;
-  this.numberOfRatings += 1;
-  this.rating = this.totalRatingScore / this.numberOfRatings;
+  const allRatings = await Booking.find({ serviceId: this._id, rating: { $exists: true } });
+  const totalRatings = allRatings.reduce((sum, booking) => sum + booking.rating, 0);
+  const averageRating = totalRatings / allRatings.length;
+  
+  this.averageRating = averageRating;
   await this.save();
 };
-
 
 
 
