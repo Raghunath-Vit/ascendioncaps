@@ -1,4 +1,4 @@
-import { LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT } from './actions';
+import { LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT, CLEAR_ERROR  } from './actions';
 
 const initialState = {
   token: null,
@@ -21,6 +21,11 @@ export const authReducer = (state = initialState, action) => {
       return {
         ...state,
         error: action.payload,
+      };
+      case CLEAR_ERROR: // Handle CLEAR_ERROR action
+      return {
+        ...state,
+        error: null,
       };
     case LOGOUT:
       return {

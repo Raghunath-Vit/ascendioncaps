@@ -4,6 +4,13 @@ import {jwtDecode} from 'jwt-decode';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILURE = 'LOGIN_FAILURE';
 export const LOGOUT = 'LOGOUT';
+export const CLEAR_ERROR = 'CLEAR_ERROR'; // Add this constant
+
+
+export const clearError = () => ({ // Add this action
+  type: CLEAR_ERROR,
+});
+
 
 export const loginUser = (email, password) => async (dispatch) => {
   try {
@@ -22,9 +29,12 @@ export const loginUser = (email, password) => async (dispatch) => {
 
     localStorage.setItem('jwtToken', token);
   } catch (error) {
+    const errorMessage = Array.isArray(error.response.data.errors)
+    ? error.response.data.errors.map(err => err.msg).join(', ')
+    : error.response.data.message;
     dispatch({
       type: LOGIN_FAILURE,
-      payload: error.response.data.message,
+      payload: errorMessage,
     });
   }
 };

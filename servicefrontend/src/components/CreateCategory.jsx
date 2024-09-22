@@ -1,212 +1,47 @@
-// import { useState, useEffect } from 'react';
-// import { Container, Grid, Card, CardContent, Typography, TextField, Button, Box, InputAdornment, Divider } from '@mui/material';
-// import { styled } from '@mui/system';
-// import { motion } from 'framer-motion';
-// import SearchIcon from '@mui/icons-material/Search';
-// import axios from 'axios';
-// import { useSelector } from 'react-redux';
-
-// // Styled form container
-// const StyledForm = styled(Box)(({ theme }) => ({
-//   display: 'flex',
-//   flexDirection: 'column',
-//   gap: theme.spacing(2),
-//   maxWidth: '400px',
-//   width: '100%',
-// }));
-
-// // Styled card for categories
-// const StyledCard = styled(Card)(({ theme }) => ({
-//   transition: 'transform 0.3s, box-shadow 0.3s',
-//   '&:hover': {
-//     transform: 'translateY(-8px)',
-//     boxShadow: theme.shadows[4] || '0px 4px 20px rgba(0, 0, 0, 0.1)',
-//   },
-// }));
-
-// const CreateCategory = () => {
-//   const [categories, setCategories] = useState([]);
-//   const [filteredCategories, setFilteredCategories] = useState([]);
-//   const [categoryName, setCategoryName] = useState('');
-//   const [categoryDescription, setCategoryDescription] = useState('');
-//   const [searchQuery, setSearchQuery] = useState('');
-
-//   // Access the token from Redux store
-//   const token = useSelector((state) => state.auth.token);
-
-
-//   useEffect(() => {
-//     // Fetch categories
-//     axios.get('http://localhost:5000/api/categories').then((response) => {
-//       setCategories(response.data);
-//       setFilteredCategories(response.data);
-//     });
-//   }, []);
-
-//   const handleSubmit = async () => {
-//     if (categoryName && categoryDescription) {
-//       try {
-//         await axios.post(
-//           'http://localhost:5000/api/categories',
-//           {
-//             name: categoryName,
-//             description: categoryDescription,
-//           },
-//           {
-//             headers: {
-//               Authorization: `Bearer ${token}`, // Attach the token as a Bearer token
-//             },
-//           }
-//         );
-
-//         const response = await axios.get('http://localhost:5000/api/categories');
-//         setCategories(response.data);
-//         setFilteredCategories(response.data);
-//         setCategoryName('');
-//         setCategoryDescription('');
-//       } catch (error) {
-//         console.error('Error creating category:', error);
-//       }
-//     }
-//   };
-
-//   const handleSearch = (e) => {
-//     setSearchQuery(e.target.value);
-//     setFilteredCategories(
-//       categories.filter((category) =>
-//         category.name.toLowerCase().includes(e.target.value.toLowerCase())
-//       )
-//     );
-//   };
-
-//   return (
-//     <Container maxWidth="lg" sx={{ mt: 4 }}>
-//       <Grid container spacing={4}>
-//         {/* Left Side - Form */}
-//         <Grid item xs={12} md={6}>
-//           <StyledForm component={motion.div} whileHover={{ scale: 1.02 }}>
-//             <Typography variant="h5">Add New Category</Typography>
-//             <TextField
-//               label="Category Name"
-//               value={categoryName}
-//               onChange={(e) => setCategoryName(e.target.value)}
-//               fullWidth
-//               variant="outlined"
-//             />
-//             <TextField
-//               label="Category Description"
-//               value={categoryDescription}
-//               onChange={(e) => setCategoryDescription(e.target.value)}
-//               fullWidth
-//               variant="outlined"
-//               multiline
-//               rows={3}
-//             />
-//             <Button variant="contained" color="primary" onClick={handleSubmit}>
-//               Add Category
-//             </Button>
-//           </StyledForm>
-//         </Grid>
-
-//         {/* Right Side - Image */}
-//         <Grid item xs={12} md={6}>
-//           <Box
-//             component={motion.div}
-//             whileHover={{ scale: 1.05 }}
-//             sx={{
-//               display: 'flex',
-//               justifyContent: 'center',
-//               alignItems: 'center',
-//               minHeight: '100%',
-//               p: 2,
-//             }}
-//           >
-//             <img
-//               src="./src/utils/DALL·E 2024-09-19 22.21.59 - An illustration related to adding a new category, represented by a colorful abstract symbol of folders or data structure icons, with a plus sign indic.webp"
-//               alt="Category Illustration"
-//               style={{ width: '100%', objectFit: 'cover', borderRadius: '8px' }}
-//             />
-//           </Box>
-//         </Grid>
-
-//         {/* Divider */}
-//         <Grid item xs={12}>
-//           <Divider sx={{ my: 4 }} />
-//         </Grid>
-
-//         {/* Search and Category List */}
-//         <Grid item xs={12} mb={4}>
-//           <TextField
-//             label="Search Categories"
-//             value={searchQuery}
-//             onChange={handleSearch}
-//             fullWidth
-//             variant="outlined"
-//             InputProps={{
-//               endAdornment: (
-//                 <InputAdornment position="end">
-//                   <SearchIcon />
-//                 </InputAdornment>
-//               ),
-//             }}
-//             sx={{ mb: 3 }}
-//           />
-//           <Grid container spacing={3}>
-//             {filteredCategories.map((category) => (
-//               <Grid item xs={12} sm={6} md={4} key={category.id}>
-//                 <StyledCard component={motion.div} whileHover={{ scale: 1.05 }}>
-//                   <CardContent>
-//                     <Typography variant="h6">{category.name}</Typography>
-//                     <Typography variant="body2" color="text.secondary">
-//                       {category.description}
-//                     </Typography>
-//                   </CardContent>
-//                 </StyledCard>
-//               </Grid>
-//             ))}
-//           </Grid>
-//         </Grid>
-//       </Grid>
-//     </Container>
-//   );
-// };
-
-// export default CreateCategory;
 import { useState, useEffect } from 'react';
 import {
   Container, Grid, Card, CardContent, Typography,
-  TextField, Button, Box, InputAdornment, Divider
+  TextField, Button, Box, InputAdornment, Divider,
+  IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,Snackbar
 } from '@mui/material';
-import { styled, useTheme } from '@mui/system';
+import { styled } from '@mui/system';
 import { motion } from 'framer-motion';
 import SearchIcon from '@mui/icons-material/Search';
+import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-import useMediaQuery from '@mui/material/useMediaQuery';
+// import useMediaQuery from '@mui/material/useMediaQuery';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-// Styled form container with animation
-const StyledForm = styled(motion(Box))(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing(3),
-  maxWidth: '400px',
-  width: '100%',
-  padding: theme.spacing(3),
-  backgroundColor: theme.palette.background.paper,
-  boxShadow: theme.shadows[3],
-  borderRadius: theme.shape.borderRadius,
-  marginTop: theme.spacing(2),
-  marginLeft: 'auto', // Centering the form
-  marginRight: 'auto',
-}));
+// Custom theme with updated color palette
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#6a1b9a', // purple
+    },
+    secondary: {
+      main: '#d1c4e9', // light purple
+    },
+    error: {
+      main: '#f44336', // red
+    },
+    background: {
+      default: '#fafafa', // light grey
+    },
+  },
+});
 
-// Styled card for categories with animation
+// Styled card for categories with proper background and text color
 const StyledCard = styled(motion(Card))(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper, // Light grey from theme for card background
+  color: theme.palette.primary.main, // Text color will use the primary color (purple)
   transition: 'transform 0.3s, box-shadow 0.3s',
+  boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
   '&:hover': {
     transform: 'translateY(-8px)',
-    boxShadow: theme.shadows[4] || '0px 4px 20px rgba(0, 0, 0, 0.1)',
+    boxShadow: theme.shadows[4], // Slight elevation on hover
   },
+  position: 'relative', // For positioning the delete icon
 }));
 
 const CreateCategory = () => {
@@ -215,11 +50,13 @@ const CreateCategory = () => {
   const [categoryName, setCategoryName] = useState('');
   const [categoryDescription, setCategoryDescription] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [isTyping, setIsTyping] = useState(false); // To track typing activity
+  const [deleteCategoryId, setDeleteCategoryId] = useState(null); // Holds the id of category to delete
+  const [openDeleteModal, setOpenDeleteModal] = useState(false); // Controls the delete modal visibility
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const token = useSelector((state) => state.auth.token);
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  // const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     axios.get('http://localhost:5000/api/categories').then((response) => {
@@ -248,7 +85,11 @@ const CreateCategory = () => {
         setFilteredCategories(response.data);
         setCategoryName('');
         setCategoryDescription('');
+        setSnackbarMessage('Category created successfully!');
+        setSnackbarOpen(true);
       } catch (error) {
+        setSnackbarMessage(error.response?.data?.message || 'Error creating category');
+        setSnackbarOpen(true);
         console.error('Error creating category:', error);
       }
     }
@@ -263,104 +104,196 @@ const CreateCategory = () => {
     );
   };
 
-  const handleTyping = () => {
-    setIsTyping(true);
-    setTimeout(() => setIsTyping(false), 1000); // Reset after typing stops
+
+  const handleDeleteClick = (categoryId) => {
+    console.log('Selected categoryId:', categoryId); // Check the ID being passed
+    setDeleteCategoryId(categoryId);
+    setOpenDeleteModal(true);
   };
+  
 
+  const handleDeleteCategory = async () => {
+    console.log('Deleting category with id:', deleteCategoryId); // Check the value before sending the request
+    try {
+      await axios.delete(`http://localhost:5000/api/delcategory/${deleteCategoryId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      // Remove the deleted category from the state
+      const updatedCategories = categories.filter((category) => category._id !== deleteCategoryId);
+      setCategories(updatedCategories);
+      setFilteredCategories(updatedCategories);
+      setOpenDeleteModal(false); // Close the modal after deletion
+      setOpenDeleteModal(false);
+      setSnackbarMessage('Category deleted successfully!');
+      setSnackbarOpen(true);
+  
+      
+    } catch (error) {
+      setSnackbarMessage(error.response?.data?.message || 'Error deleting category');
+      setSnackbarOpen(true);
+      console.error('Error deleting category:', error);
+    }
+  };
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+  
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Grid container spacing={4} justifyContent="center">
-          {/* Add Category Form - Centered */}
-          <Grid item xs={12} md={6}>
-            <StyledForm
-              initial={{ translateY: 100, opacity: 0 }}
-              animate={{ translateY: 0, opacity: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Typography variant="h5">Add New Category</Typography>
-              <TextField
-                label="Category Name"
-                value={categoryName}
-                onChange={(e) => {
-                  setCategoryName(e.target.value);
-                  handleTyping(e); // Trigger typing activity
+    <ThemeProvider theme={theme}>
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Grid container spacing={4} justifyContent="center">
+            {/* Add Category Form - Centered */}
+            <Grid item xs={12} md={6}>
+              <Box
+                display="flex"
+                flexDirection="column"
+                gap={3}
+                padding={3}
+                sx={{
+                  maxWidth: '400px',
+                  width: '100%',
+                  backgroundColor: 'background.paper',
+                  boxShadow: 3,
+                  borderRadius: 2,
+                  marginTop: 2,
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
                 }}
-                fullWidth
-                variant="outlined"
-              />
-              <TextField
-                label="Category Description"
-                value={categoryDescription}
-                onChange={(e) => {
-                  setCategoryDescription(e.target.value);
-                  handleTyping(e); // Trigger typing activity
-                }}
-                fullWidth
-                variant="outlined"
-                multiline
-                rows={3}
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSubmit}
                 component={motion.div}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                sx={{ ml: 'auto', mt: 2 }} // Shift button towards the right
+                initial={{ translateY: 100, opacity: 0 }}
+                animate={{ translateY: 0, opacity: 1 }}
+                transition={{ duration: 0.5 }}
               >
-                Add Category
-              </Button>
-            </StyledForm>
-          </Grid>
+                <Typography variant="h5" align="center" color="primary">
+                  Add New Category
+                </Typography>
+                <TextField
+                  label="Category Name"
+                  value={categoryName}
+                  onChange={(e) => setCategoryName(e.target.value)}
+                  fullWidth
+                  variant="outlined"
+                  color="primary"
+                />
+                <TextField
+                  label="Category Description"
+                  value={categoryDescription}
+                  onChange={(e) => setCategoryDescription(e.target.value)}
+                  fullWidth
+                  variant="outlined"
+                  color="primary"
+                  multiline
+                  rows={3}
+                />
+                <Box display="flex" justifyContent="center">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSubmit}
+                    component={motion.div}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Add Category
+                  </Button>
+                </Box>
+              </Box>
+            </Grid>
 
-          {/* Divider */}
-          <Grid item xs={12}>
-            <Divider sx={{ my: 4 }} />
-          </Grid>
+            {/* Divider */}
+            <Grid item xs={12}>
+              <Divider sx={{ my: 4 }} />
+            </Grid>
 
-          {/* Search and Category List */}
-          <Grid item xs={12} mb={4}>
-            <TextField
-              label="Search Categories"
-              value={searchQuery}
-              onChange={handleSearch}
-              fullWidth
-              variant="outlined"
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ mb: 3 }}
-            />
-            <Grid container spacing={3}>
-              {filteredCategories.map((category) => (
-                <Grid item xs={12} sm={6} md={4} key={category.id}>
-                  <StyledCard whileHover={{ scale: 1.05 }}>
-                    <CardContent>
-                      <Typography variant="h6">{category.name}</Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {category.description}
-                      </Typography>
-                    </CardContent>
-                  </StyledCard>
-                </Grid>
-              ))}
+            {/* Search and Category List */}
+            <Grid item xs={12} mb={4}>
+              <TextField
+                label="Search Categories"
+                value={searchQuery}
+                onChange={handleSearch}
+                fullWidth
+                variant="outlined"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{ mb: 3 }}
+              />
+              <Grid container spacing={3}>
+                {filteredCategories.map((category) => (
+                   // Log to check the structure
+                  <Grid item xs={12} sm={6} md={4} key={category._id}>
+                    <StyledCard whileHover={{ scale: 1.05 }}>
+                      <CardContent>
+                        <Typography variant="h6" color="primary"> {/* Primary color for the card title */}
+                          {category.name}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary"> {/* Default text color */}
+                          {category.description}
+                        </Typography>
+
+                        {/* Delete Icon */}
+                        <IconButton
+                          onClick={() => handleDeleteClick(category._id)}
+                          sx={{ position: 'absolute', top: 8, right: 8, color: theme.palette.error.main }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </CardContent>
+                    </StyledCard>
+                  </Grid>
+                ))}
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
-      </motion.div>
-    </Container>
+        {/* </motion.div> */}
+
+        {/* Delete Confirmation Modal */}
+        <Dialog
+          open={openDeleteModal}
+          onClose={() => setOpenDeleteModal(false)}
+        >
+          <DialogTitle>Confirm Delete</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Are you sure you want to delete this category?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenDeleteModal(false)} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={handleDeleteCategory} color="error">
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+         {/* Snackbar for notifications */}
+         <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={6000}
+            onClose={handleSnackbarClose}
+            message={snackbarMessage}
+          />
+        </motion.div>
+      </Container>
+    </ThemeProvider>
   );
 };
 
 export default CreateCategory;
+
+
+

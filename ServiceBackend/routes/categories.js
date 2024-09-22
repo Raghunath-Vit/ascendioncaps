@@ -55,4 +55,25 @@ router.get('/categories', async (req, res) => {
     }
 });
 
+
+// Delete a Category by ID (Admin only)
+router.delete('/delcategory/:id', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Access denied. Only admins can delete categories.' });
+    }
+
+    try {
+        const category = await Category.findByIdAndDelete(req.params.id);
+
+        if (!category) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+
+        res.status(200).json({ message: 'Category deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
 module.exports = router;

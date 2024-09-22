@@ -8,7 +8,7 @@ const user=require('../models/User');
 const multer = require('multer');
 const dotenv = require('dotenv');
 const { body, param, validationResult } = require('express-validator');
-const upload = multer({ dest: 'uploads/' }); // Store proof images
+const upload = multer({ dest: 'uploads/' }); 
 const { verifyOtp } = require('../controllers/otp');
 const Service = require('../models/Service');
 const ServiceProvider=require('../models/ServiceProviderModel');
@@ -33,6 +33,41 @@ const validate = (req, res, next) => {
 };
 
 // Create a booking
+// router.post(
+//   '/',
+//   auth,
+//   [
+//     body('userId').isMongoId().withMessage('Invalid user ID'),
+//     body('serviceProviderId').isMongoId().withMessage('Invalid serviceProvider ID'),
+//     body('bookingDate').isISO8601().withMessage('Invalid booking date'),
+//   ],
+//   validate,
+//   async (req, res) => {
+//     try {
+//       const { userId, serviceProviderId, bookingDate } = req.body;
+
+//       // Fetch the service to get the service provider ID
+//       const service = await ServiceProvider.findById(serviceProviderId);
+//       if (!service) {
+//         return res.status(404).json({ error: 'serviceProvider not found' });
+//       }
+
+//       // Create the booking with serviceProviderId
+//       const booking = new Booking({
+//         userId,
+//         // serviceId,
+//         serviceProviderId: serviceProviderId, // Populate from the service
+//         bookingDate,
+//       });
+
+//       await booking.save();
+//       res.json({ message: 'Booking successful', booking });
+//     } catch (error) {
+//       res.status(500).json({ error: 'Error creating booking' });
+//     }
+//   }
+// );
+// Create a booking
 router.post(
   '/',
   auth,
@@ -46,27 +81,38 @@ router.post(
     try {
       const { userId, serviceProviderId, bookingDate } = req.body;
 
-      // Fetch the service to get the service provider ID
-      const service = await ServiceProvider.findById(serviceProviderId);
-      if (!service) {
-        return res.status(404).json({ error: 'serviceProvider not found' });
+      // Fetch the service provider to get their userId (worker)
+      const serviceProvider = await ServiceProvider.findById(serviceProviderId).populate('userId');
+      if (!serviceProvider) {
+        return res.status(404).json({ error: 'Service provider not found' });
       }
 
-      // Create the booking with serviceProviderId
+      // Create the booking
       const booking = new Booking({
         userId,
-        // serviceId,
-        serviceProviderId: serviceProviderId, // Populate from the service
+        serviceProviderId,
         bookingDate,
       });
 
       await booking.save();
-      res.json({ message: 'Booking successful', booking });
+
+      // Send a notification message to the worker (service provider)
+      const workerPhoneNumber = serviceProvider.userId.phoneNumber;
+      if (workerPhoneNumber) {
+        await client.messages.create({
+          body: `A new work has been assigned to you. Booking ID: ${booking._id}`,
+          from: process.env.TWILIO_PHONE_NUMBER,
+          to: workerPhoneNumber,
+        });
+      }
+
+      res.json({ message: 'Booking successful and notification sent to worker', booking });
     } catch (error) {
       res.status(500).json({ error: 'Error creating booking' });
     }
   }
 );
+
 
 // Upload beforeWorking and afterWorking proof images and complete the booking
 router.post(
@@ -302,10 +348,10 @@ router.post('/notify', async (req, res) => {
     // Update booking status based on worker's message (Accepted or Declined)
     if (message === 'Accepted') {
       booking.status = 'Confirmed';
-    } else if (message === 'Declined') {
+    } else if (message === 'Rejected') {
       booking.status = 'Closed';
     } else {
-      return res.status(400).json({ error: 'Invalid message. Must be "Accepted" or "Declined".' });
+      return res.status(400).json({ error: 'Invalid message. Must be "Accepted" or "Rejected".' });
     }
 
     // Save the updated booking status

@@ -163,14 +163,13 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, TextField, IconButton, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Collapse, Button, Dialog, DialogActions, DialogContent, DialogTitle, Icon } from '@mui/material';
+import { Container, Typography, TextField, IconButton, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Collapse, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-import { motion } from 'framer-motion'; // For animations
 
 const ViewUsers = () => {
   const [users, setUsers] = useState([]);

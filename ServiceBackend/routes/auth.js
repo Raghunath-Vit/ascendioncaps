@@ -1,9 +1,9 @@
-
+const { body, validationResult } = require('express-validator');
 const express = require('express');
 const passport = require('passport');
 const twilio = require('twilio');
 const jwt = require('jsonwebtoken');
-const { body, validationResult } = require('express-validator'); // express-validator for validation
+ // express-validator for validation
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const router = express.Router();
@@ -190,6 +190,7 @@ router.post(
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log(errors.array()); // Log the validation errors
       return res.status(400).json({ errors: errors.array() });
     }
 

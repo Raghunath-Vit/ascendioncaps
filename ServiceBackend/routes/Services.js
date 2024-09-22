@@ -41,9 +41,6 @@ router.post('/services',
       .optional()
       .trim()
       .isLength({ max: 1000 }).withMessage('Description cannot exceed 1000 characters'),
-    body('priceRange')
-      .notEmpty().withMessage('Price range is required')
-      .isString().withMessage('Price range must be a string'),
   ],
   async (req, res) => {
     if (req.user.role !== 'admin') {
@@ -55,13 +52,12 @@ router.post('/services',
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { categoryId, serviceName, description, priceRange } = req.body;
+    const { categoryId, serviceName, description } = req.body;
     try {
       const service = new Service({ 
         categoryId, 
         serviceName, 
         description, 
-        priceRange,
         serviceProviderId: [] // Empty array, can be updated later
       });
       await service.save();

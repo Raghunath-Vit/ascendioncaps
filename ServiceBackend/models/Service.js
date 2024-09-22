@@ -15,7 +15,7 @@ const serviceSchema = new mongoose.Schema({
     // required: true
   },
   serviceName: { type: String, required: true },
-  priceRange: { type: String, required: true },
+  // priceRange: { type: String, required: true },
   price:{type:String},
   description: { type: String },
   rating:{

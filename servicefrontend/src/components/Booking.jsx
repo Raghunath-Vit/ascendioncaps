@@ -8,7 +8,6 @@ import { Close as CloseIcon } from '@mui/icons-material';
 const Booking = () => {
   const { id: serviceProviderId } = useParams(); // Fetch serviceProviderId from route
   const { user, token } = useSelector((state) => state.auth); // Fetch userId from Redux state
-  // console.log(user.id);
   const [bookingDate, setBookingDate] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -23,7 +22,7 @@ const Booking = () => {
 
     try {
       // Make a POST request to create a booking
-      await axios.post('http://localhost:5000/api/bookings', {
+      const response = await axios.post('http://localhost:5000/api/bookings', {
         userId: user.id,
         serviceProviderId: serviceProviderId,
         bookingDate,
@@ -33,14 +32,18 @@ const Booking = () => {
         }
       });
 
-      setSnackbarMessage('Booking created successfully!');
+      // Extract the message from the backend response
+      const { message } = response.data;
+      setSnackbarMessage(message || 'Booking created successfully!');
       setSnackbarOpen(true);
 
       // Optionally navigate to a different page after booking
       navigate('/create-service'); // Adjust this to the correct route for your app
     } catch (err) {
       console.error(err);
-      setSnackbarMessage('Error creating booking');
+      // Check if the error response contains a message
+      const errorMessage = err.response?.data?.message || 'Error creating booking';
+      setSnackbarMessage(errorMessage);
       setSnackbarOpen(true);
     }
   };
@@ -80,7 +83,7 @@ const Booking = () => {
           }}
           fullWidth
         />
-        <Button variant="contained" color="primary" onClick={handleSubmit}>
+        <Button variant="contained" onClick={handleSubmit} sx={{ backgroundColor: '#6a1b9a' }}>
           Submit Booking
         </Button>
       </Box>

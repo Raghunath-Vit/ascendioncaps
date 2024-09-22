@@ -1,10 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
-import { Container, Typography, Grid, Card, CardContent, CircularProgress, Modal, Box, IconButton, Button, TextField } from '@mui/material';
+import { Container, Typography, Grid, Card, CardContent, CircularProgress, Modal, Box, IconButton, Button, TextField, Snackbar } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import DeleteIcon from '@mui/icons-material/Delete'; // Import delete icon
-import EditIcon from '@mui/icons-material/Edit';   // Import edit icon
-import CheckIcon from '@mui/icons-material/Check';  // Import tick icon
-import CancelIcon from '@mui/icons-material/Cancel';  // Import close icon
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -17,18 +15,19 @@ const CreateService = () => {
   const [loadingServices, setLoadingServices] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const [selectedCategoryName, setSelectedCategoryName] = useState('');
-  const [newService, setNewService] = useState({ serviceName: '', description: '', priceRange: '' });
+  const [newService, setNewService] = useState({ serviceName: '', description: '' });
   const [showServiceForm, setShowServiceForm] = useState(false);
-  const [editService, setEditService] = useState(null);  // State for editing service
+  const [editService, setEditService] = useState(null);
   const [deleteServiceId, setDeleteServiceId] = useState(null);
   const [confirmDeleteModal, setConfirmDeleteModal] = useState(false);
   const [deleteServiceName, setDeleteServiceName] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
   const servicesEndRef = useRef(null);
-  
-  const { user, token } = useSelector((state) => state.auth);
-  const navigate = useNavigate(); // Initialize useNavigate
 
-  // Fetch categories from the backend
+  const { user, token } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -65,9 +64,9 @@ const CreateService = () => {
   const handleModalClose = () => {
     setModalOpen(false);
     setServices([]);
-    setNewService({ serviceName: '', description: '', priceRange: '' });
+    setNewService({ serviceName: '', description: '' });
     setShowServiceForm(false);
-    setEditService(null); // Clear edit state on close
+    setEditService(null);
   };
 
   const handleInputChange = (e) => {
@@ -86,7 +85,6 @@ const CreateService = () => {
           categoryId: selectedCategoryId,
           serviceName: newService.serviceName,
           description: newService.description,
-          priceRange: newService.priceRange,
         },
         {
           headers: {
@@ -97,21 +95,25 @@ const CreateService = () => {
 
       setServices((prevServices) => [...prevServices, response.data]);
       servicesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      setNewService({ serviceName: '', description: '', priceRange: '' });
+      setNewService({ serviceName: '', description: '' });
       setShowServiceForm(false);
+      setSnackbarMessage('Service created successfully!');
+      setSnackbarOpen(true);
+      await fetchServices(selectedCategoryId);
     } catch (error) {
       console.error('Error creating service:', error);
+      setSnackbarMessage('Error creating service.');
+      setSnackbarOpen(true);
     }
   };
 
   const handleEditClick = (service) => {
-    setEditService(service); // Set service to be edited
+    setEditService(service);
     setNewService({
       serviceName: service.serviceName,
       description: service.description,
-      priceRange: service.priceRange,
     });
-    setShowServiceForm(true); // Show form for editing
+    setShowServiceForm(true);
   };
 
   const handleUpdateService = async () => {
@@ -132,10 +134,14 @@ const CreateService = () => {
         )
       );
       setEditService(null);
-      setNewService({ serviceName: '', description: '', priceRange: '' });
+      setNewService({ serviceName: '', description: '' });
       setShowServiceForm(false);
+      setSnackbarMessage('Service updated successfully!');
+      setSnackbarOpen(true);
     } catch (error) {
       console.error('Error updating service:', error);
+      setSnackbarMessage('Error updating service.');
+      setSnackbarOpen(true);
     }
   };
 
@@ -160,14 +166,22 @@ const CreateService = () => {
       });
       setServices((prevServices) => prevServices.filter((service) => service._id !== deleteServiceId));
       setConfirmDeleteModal(false);
+      setSnackbarMessage('Service deleted successfully!');
+      setSnackbarOpen(true);
     } catch (error) {
       console.error('Error deleting service:', error);
+      setSnackbarMessage('Error deleting service.');
+      setSnackbarOpen(true);
     }
   };
 
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
   return (
-    <Container sx={{ paddingY: 5 }}>
-      <Typography variant="h3" align="center" sx={{ fontWeight: 'bold', marginBottom: 3 }}>
+    <Container sx={{ paddingY: 5, bgcolor: '#fafafa' }}>
+      <Typography variant="h3" align="center" sx={{ fontWeight: 'bold', marginBottom: 3, color: '#6a1b9a' }}>
         Home services at your doorstep
       </Typography>
 
@@ -180,7 +194,18 @@ const CreateService = () => {
           {categories.map((category) => (
             <Grid item xs={12} sm={6} md={4} key={category._id}>
               <Card
-                sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer' }}
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  cursor: 'pointer',
+                  bgcolor: '#fafafa',
+                  '&:hover': {
+                    transform: 'scale(1.02)',
+                    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.9)',
+                  },
+                }}
                 onClick={() => handleCardClick(category._id, category.name)}
               >
                 <CardContent>
@@ -194,12 +219,12 @@ const CreateService = () => {
       )}
 
       <Modal open={modalOpen} onClose={handleModalClose} sx={{ overflowY: 'auto' }}>
-        <Box sx={{ ...modalBoxStyles }}>
+        <Box sx={modalBoxStyles}>
           <IconButton onClick={handleModalClose} sx={{ position: 'absolute', top: 8, right: 8 }}>
             <CloseIcon />
           </IconButton>
 
-          <Typography variant="h6" gutterBottom>Services under "{selectedCategoryName}"</Typography>
+          <Typography variant="h6" gutterBottom color="#6a1b9a">Services under "{selectedCategoryName}"</Typography>
 
           {loadingServices ? (
             <Grid container justifyContent="center"><CircularProgress /></Grid>
@@ -208,9 +233,8 @@ const CreateService = () => {
               {services.map((service) => (
                 <Grid item xs={12} key={service._id}>
                   <Card
-                    sx={{ marginBottom: 2, position: 'relative', cursor: 'pointer' }}
+                    sx={{ marginBottom: 2, position: 'relative', cursor: 'pointer', bgcolor: '#ffffff', boxShadow: 2 }}
                     onClick={() => {
-                      // Navigate to add-service route with service ID for workers/users
                       if (user && (user.role === 'worker' || user.role === 'user')) {
                         navigate(`/add-service/${service._id}`);
                       }
@@ -219,18 +243,18 @@ const CreateService = () => {
                     {user && user.role === 'admin' ? (
                       <>
                         <IconButton
-                          sx={{ position: 'absolute', top: 8, right: 32, color: 'blue' }}
+                          sx={{ position: 'absolute', top: 8, right: 32, color: '#6a1b9a' }}
                           onClick={(e) => {
-                            e.stopPropagation(); // Prevent triggering card click
+                            e.stopPropagation();
                             handleEditClick(service);
                           }}
                         >
                           <EditIcon />
                         </IconButton>
                         <IconButton
-                          sx={{ position: 'absolute', top: 8, right: 8, color: 'red' }}
+                          sx={{ position: 'absolute', top: 8, right: 8, color: '#f44336' }}
                           onClick={(e) => {
-                            e.stopPropagation(); // Prevent triggering card click
+                            e.stopPropagation();
                             handleDeleteClick(service._id, service.serviceName);
                           }}
                         >
@@ -239,90 +263,134 @@ const CreateService = () => {
                       </>
                     ) : null}
                     <CardContent>
-                      <Typography variant="h6" gutterBottom>{service.serviceName}</Typography>
+                      <Typography variant="h6">{service.serviceName}</Typography>
                       <Typography variant="body2" color="textSecondary">{service.description}</Typography>
-                      <Typography variant="body1">Price Range: {service.priceRange}</Typography>
-                      <Typography variant="body2" color="textSecondary">Rating: {service.rating}</Typography>
                     </CardContent>
                   </Card>
                 </Grid>
               ))}
-              <div ref={servicesEndRef} />
-            </Grid>
-          )}
-
-          {user && user.role === 'admin' && (
-            <>
               {showServiceForm && (
-                <Box sx={{ marginTop: 3 }}>
-                  <Typography variant="h6">{editService ? 'Edit Service' : 'Create New Service'}</Typography>
+                <Grid item xs={12}>
                   <TextField
-                    label="Service Name"
                     name="serviceName"
+                    label="Service Name"
+                    variant="outlined"
+                    fullWidth
                     value={newService.serviceName}
                     onChange={handleInputChange}
-                    fullWidth
-                    margin="normal"
+                    sx={{ marginBottom: 2 }}
                   />
                   <TextField
-                    label="Description"
                     name="description"
+                    label="Description"
+                    variant="outlined"
+                    fullWidth
+                    multiline
+                    rows={4}
                     value={newService.description}
                     onChange={handleInputChange}
-                    fullWidth
-                    margin="normal"
-                  />
-                  <TextField
-                    label="Price Range"
-                    name="priceRange"
-                    value={newService.priceRange}
-                    onChange={handleInputChange}
-                    fullWidth
-                    margin="normal"
+                    sx={{ marginBottom: 2 }}
                   />
                   <Button
                     variant="contained"
-                    color="primary"
+                    
                     onClick={editService ? handleUpdateService : handleCreateService}
-                    sx={{ marginTop: 2 }}
+                    sx={{ marginBottom: 2,bgcolor: '#6a1b9a', color: '#fff'}}
                   >
                     {editService ? 'Update Service' : 'Create Service'}
                   </Button>
-                </Box>
+                </Grid>
               )}
-            </>
+            </Grid>
           )}
+
+        {user && user.role === 'admin' && (
+          <Grid container justifyContent="flex-end">
+            <Button
+              variant="outlined"
+              onClick={() => setShowServiceForm((prev) => !prev)}
+              sx={{ borderColor: '#6a1b9a', color: '#6a1b9a', '&:hover': { borderColor: '#6a1b9a', backgroundColor: '#f0e6f7' } }}
+            >
+              {showServiceForm ? 'Hide Form' : 'Add Service'}
+            </Button>
+          </Grid>
+        )}
         </Box>
       </Modal>
 
+      {/* Confirmation Delete Modal
       <Modal open={confirmDeleteModal} onClose={handleDeleteCancel}>
-        <Box sx={modalBoxStyles}>
-          <Typography variant="h6" gutterBottom>Are you sure you want to delete "{deleteServiceName}"?</Typography>
-          <Box display="flex" justifyContent="space-between" marginTop={2}>
-            <IconButton onClick={handleDeleteConfirm} color="primary">
-              <CheckIcon />
-            </IconButton>
-            <IconButton onClick={handleDeleteCancel} color="secondary">
-              <CancelIcon />
-            </IconButton>
-          </Box>
-        </Box>
+        <Box sx={confirmDeleteModalStyles}>
+          <Typography variant="h6" gutterBottom color="#f44336">Delete Service</Typography>
+          <Typography variant="body2">Are you sure you want to delete "{deleteServiceName}"?</Typography>
+          <Grid container justifyContent="space-between" sx={{ marginTop: 2 }}>
+            <Button variant="outlined" onClick={handleDeleteCancel}>Cancel</Button>
+            <Button variant="contained" color="error" onClick={handleDeleteConfirm}>Delete</Button>
+          </Grid>
+        </Box> */}
+        
+      {/* Confirm Delete Modal */}
+       <Modal open={confirmDeleteModal} onClose={handleDeleteCancel}>
+         <Box sx={confirmDeleteModalStyles}>
+           <Typography variant="h6" gutterBottom color="#6a1b9a">Are you sure you want to delete the service "{deleteServiceName}"?</Typography>
+           <Box sx={{ textAlign: 'right', marginTop: 3 }}>
+             <Button variant="contained" color="error" onClick={handleDeleteConfirm} sx={{ marginRight: 2 }}>
+               Delete
+             </Button>
+             <Button variant="outlined" onClick={handleDeleteCancel}>
+               Cancel
+             </Button>
+           </Box>
+         </Box>
       </Modal>
+
+      {/* Snackbar for messages */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+        action={
+          <IconButton
+            size="small"
+            aria-label="close"
+            color="inherit"
+            onClick={handleSnackbarClose}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        }
+      />
+
+      <div ref={servicesEndRef} />
     </Container>
   );
 };
-
+// // Styles
 const modalBoxStyles = {
+  position: 'absolute',
+  top: '60%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '80%',
+  maxHeight: '70vh',
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 4,
+  borderRadius: 2,
+  overflowY: 'auto',
+};
+
+const confirmDeleteModalStyles = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
+  width: '300px',
   bgcolor: 'background.paper',
   boxShadow: 24,
   p: 4,
-  maxHeight: '80vh',  // Set maximum height for the modal
-  overflowY: 'auto',  // Enable scrolling for overflowing content
+  borderRadius: 2,
 };
 
 export default CreateService;

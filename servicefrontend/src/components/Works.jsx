@@ -1,8 +1,9 @@
-// import { useEffect, useState } from 'react'; 
+
+// import { useEffect, useState, useCallback } from 'react'; 
 // import { useSelector } from 'react-redux';
 // import { useNavigate } from 'react-router-dom';
 // import axios from 'axios';
-// import { Box, Typography, CircularProgress, ListItem, ListItemText, Paper, Grid, Select, MenuItem, InputLabel, FormControl, Modal, IconButton } from '@mui/material';
+// import { Box, Typography, CircularProgress, ListItem, ListItemText, Paper, Tab, Tabs, Modal, IconButton, Grid } from '@mui/material';
 // import { motion } from 'framer-motion';
 // import CheckIcon from '@mui/icons-material/Check';
 // import CloseIcon from '@mui/icons-material/Close';
@@ -11,62 +12,62 @@
 //   const [requestedBookings, setRequestedBookings] = useState([]);
 //   const [loading, setLoading] = useState(true);
 //   const [error, setError] = useState(null);
-//   const [filterStatus, setFilterStatus] = useState('All');
-//   const [openModal, setOpenModal] = useState(false); // Modal state
-//   const [selectedBooking, setSelectedBooking] = useState(null); // To track the selected booking
+//   const [openModal, setOpenModal] = useState(false);
+//   const [selectedBooking, setSelectedBooking] = useState(null);
+//   const [tabValue, setTabValue] = useState(0);
 
-//   // Get the user and token from the Redux store
 //   const { user, token } = useSelector((state) => state.auth);
+//   const navigate = useNavigate();
 
-//   const navigate = useNavigate(); // Hook for navigation
+//   const fetchBookings = useCallback(async () => {
+//     if (!user) return;
 
-//   useEffect(() => {
-//     const fetchBookings = async () => {
-//       if (!user) return; // Don't fetch if userId is not available
-  
-//       try {
-//         const response = await axios.get(`http://localhost:5000/api/bookings/requestedbooking/${user.id}`, {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//           },
-//         });
-//         setRequestedBookings(response.data.bookings || []); // Ensure it's an array
-//         setLoading(false);
-//       } catch (err) {
-//         setError(err.message || 'Error fetching bookings');
-//         setLoading(false);
-//       }
-//     };
-  
-//     fetchBookings();
+//     try {
+//       const response = await axios.get(`http://localhost:5000/api/bookings/requestedbooking/${user.id}`, {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       });
+//       setRequestedBookings(response.data.bookings || []);
+//       setLoading(false);
+//     } catch (err) {
+//       setError(err.message || 'Error fetching bookings');
+//       setLoading(false);
+//     }
 //   }, [user, token]);
 
-//   // Filter bookings based on the selected status
-//   const filteredBookings = requestedBookings.filter(booking => 
-//     filterStatus === 'All' || booking.status === filterStatus
-//   );
+//   useEffect(() => {
+//     fetchBookings();
+//     console.log(requestedBookings); // Debug log
+//   }, [user, token, fetchBookings]);
 
-//   const getBookingsByStatus = (status) => {
-//     return requestedBookings.filter(booking => status.includes(booking.status));
+//   const handleTabChange = (event, newValue) => {
+//     setTabValue(newValue);
 //   };
 
-//   // Handle double-click to open the modal
+//   const getBookingsByStatus = (status) => {
+//     return requestedBookings.filter(booking => booking.status.toLowerCase() === status.toLowerCase());
+//   };
+  
+
 //   const handleDoubleClick = (booking) => {
 //     setSelectedBooking(booking);
 //     setOpenModal(true);
 //   };
 
-//   // Handle double-click on Confirmed status to navigate to another route
+  
 //   const handleDoubleClickConfirmed = (bookingId) => {
-//     navigate(`/verifywork/${bookingId}`); // Navigate to the VerifyWork page with the booking ID
+//     navigate(`/verifywork/${bookingId}`);
 //   };
 
-//   // Handle accept or reject task
+  
+
+
 //   const handleResponse = async (responseMessage) => {
 //     if (!selectedBooking) return;
 
 //     try {
-//       const res = await axios.post('http://localhost:5000/api/bookings/notify', {
+//       await axios.post('http://localhost:5000/api/bookings/notify', {
 //         message: responseMessage,
 //         bookingId: selectedBooking._id
 //       }, {
@@ -74,37 +75,30 @@
 //           Authorization: `Bearer ${token}`,
 //         },
 //       });
-
-//       console.log(res.data); // Handle response
-//       // Close the modal after submitting the response
 //       setOpenModal(false);
 //       setSelectedBooking(null);
+//       fetchBookings();
 //     } catch (err) {
 //       console.log('Error sending response:', err);
 //     }
 //   };
 
+//   const handleCloseModal = () => {
+//     setOpenModal(false); // This closes the modal
+//     setSelectedBooking(null); // Reset the selected booking
+//   };
 //   return (
 //     <Box sx={{ padding: 3, maxWidth: 1200, margin: 'auto' }}>
 //       <Typography variant="h4" align="center" gutterBottom>
 //         Requested Bookings
 //       </Typography>
 
-//       {/* Filter Dropdown */}
-//       <FormControl fullWidth sx={{ marginBottom: 2 }}>
-//         <InputLabel>Status Filter</InputLabel>
-//         <Select
-//           value={filterStatus}
-//           onChange={(e) => setFilterStatus(e.target.value)}
-//           label="Status Filter"
-//         >
-//           <MenuItem value="All">All</MenuItem>
-//           <MenuItem value="Pending">Pending</MenuItem>
-//           <MenuItem value="Confirmed">Confirmed</MenuItem>
-//           <MenuItem value="Completed">Completed</MenuItem>
-//           <MenuItem value="Closed">Closed</MenuItem>
-//         </Select>
-//       </FormControl>
+//       <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" sx={{ padding: 2, maxWidth: 1200, margin: 'auto' }}>
+//         <Tab label="Pending" />
+//         <Tab label="Confirmed" />
+//         <Tab label="Completed" />
+//         <Tab label="Closed" />
+//       </Tabs>
 
 //       {loading ? (
 //         <Box display="flex" justifyContent="center">
@@ -112,22 +106,17 @@
 //         </Box>
 //       ) : error ? (
 //         <Typography color="error" align="center">{error}</Typography>
-//       ) : filteredBookings.length === 0 ? (
-//         <Typography align="center">No bookings found.</Typography>
 //       ) : (
-//         <Grid container spacing={2}>
-//           {/* Pending Column */}
-//           <Grid item xs={12} md={4}>
-//             <Typography variant="h6" align="center" gutterBottom>Pending</Typography>
-//             {getBookingsByStatus(['Pending']).map((booking) => (
+//         <Grid container spacing={3}>
+//          {tabValue === 0 && getBookingsByStatus('Pending').map((booking) => (
+//   <Grid item xs={12} sm={6} md={4} lg={4} key={booking._id}>
 //               <motion.div 
-//                 key={booking._id}
 //                 initial={{ opacity: 0, scale: 0.9 }} 
 //                 animate={{ opacity: 1, scale: 1 }} 
 //                 transition={{ duration: 0.3 }}
-//                 onDoubleClick={() => handleDoubleClick(booking)} // Open modal on double-click
+//                 onDoubleClick={() => handleDoubleClick(booking)}
 //               >
-//                 <Paper elevation={3} sx={{ margin: 2, padding: 2, borderRadius: 2 }}>
+//                 <Paper elevation={3} sx={{ padding: 2, borderRadius: 2, height: 150 }}>
 //                   <ListItem>
 //                     <ListItemText 
 //                       primary={<Typography variant="h6">{booking.userId.name}</Typography>}
@@ -141,21 +130,17 @@
 //                   </ListItem>
 //                 </Paper>
 //               </motion.div>
-//             ))}
-//           </Grid>
-
-//           {/* Confirmed Column */}
-//           <Grid item xs={12} md={4}>
-//             <Typography variant="h6" align="center" gutterBottom>Confirmed</Typography>
-//             {getBookingsByStatus(['Confirmed']).map((booking) => (
+//             </Grid>
+//           ))}
+//           {tabValue === 1 && getBookingsByStatus('Confirmed').map((booking) => (
+//   <Grid item xs={12} sm={6} md={4} lg={4} key={booking._id}>
 //               <motion.div 
-//                 key={booking._id}
 //                 initial={{ opacity: 0, scale: 0.9 }} 
 //                 animate={{ opacity: 1, scale: 1 }} 
 //                 transition={{ duration: 0.3 }}
-//                onDoubleClick={() => handleDoubleClickConfirmed(booking._id)} // Navigate to verify work on double-click
+//                 onDoubleClick={() => handleDoubleClickConfirmed(booking._id)}
 //               >
-//                 <Paper elevation={3} sx={{ margin: 2, padding: 2, borderRadius: 2 }}>
+//                 <Paper elevation={3} sx={{ padding: 2, borderRadius: 2, height: 150 }}>
 //                   <ListItem>
 //                     <ListItemText 
 //                       primary={<Typography variant="h6">{booking.userId.name}</Typography>}
@@ -169,20 +154,17 @@
 //                   </ListItem>
 //                 </Paper>
 //               </motion.div>
-//             ))}
-//           </Grid>
-
-//           {/* Completed/Closed Column */}
-//           <Grid item xs={12} md={4}>
-//             <Typography variant="h6" align="center" gutterBottom>Completed / Closed</Typography>
-//             {getBookingsByStatus(['Completed', 'Closed']).map((booking) => (
+//             </Grid>
+//           ))}
+//           {tabValue === 2 && getBookingsByStatus('Completed').map((booking) => (
+//   <Grid item xs={12} sm={6} md={4} lg={4} key={booking._id}>
 //               <motion.div 
-//                 key={booking._id}
 //                 initial={{ opacity: 0, scale: 0.9 }} 
 //                 animate={{ opacity: 1, scale: 1 }} 
 //                 transition={{ duration: 0.3 }}
+//                 onDoubleClick={() => handleDoubleClickConfirmed(booking._id)} 
 //               >
-//                 <Paper elevation={3} sx={{ margin: 2, padding: 2, borderRadius: 2 }}>
+//                <Paper elevation={3} sx={{ padding: 2, borderRadius: 2, height: 150 }}>
 //                   <ListItem>
 //                     <ListItemText 
 //                       primary={<Typography variant="h6">{booking.userId.name}</Typography>}
@@ -196,17 +178,36 @@
 //                   </ListItem>
 //                 </Paper>
 //               </motion.div>
-//             ))}
-//           </Grid>
+//             </Grid>
+//           ))}
+//           {tabValue === 3 && getBookingsByStatus('Closed').map((booking) => (
+//   <Grid item xs={12} sm={6} md={4} lg={4} key={booking._id}>
+//               <motion.div 
+//                 initial={{ opacity: 0, scale: 0.9 }} 
+//                 animate={{ opacity: 1, scale: 1 }} 
+//                 transition={{ duration: 0.3 }}
+//               >
+//                 <Paper elevation={3} sx={{ padding: 2, borderRadius: 2, height: 150 }}>
+//                   <ListItem>
+//                     <ListItemText 
+//                       primary={<Typography variant="h6">{booking.userId.name}</Typography>}
+//                       secondary={
+//                         <>
+//                           <Typography variant="body2">Service: {booking.serviceProviderId.serviceName}</Typography>
+//                           <Typography variant="body2">Date: {new Date(booking.bookingDate).toLocaleDateString()}</Typography>
+//                         </>
+//                       }
+//                     />
+//                   </ListItem>
+//                 </Paper>
+//               </motion.div>
+//             </Grid>
+//           ))}
 //         </Grid>
 //       )}
 
-//       {/* Modal for accepting or declining the task */}
 //       {selectedBooking && (
-//         <Modal
-//           open={openModal}
-//           onClose={() => setOpenModal(false)}
-//         >
+//         <Modal open={openModal} onClose={handleCloseModal}>
 //           <Box sx={{ 
 //             position: 'absolute', 
 //             top: '50%', 
@@ -224,7 +225,12 @@
 //               <IconButton onClick={() => handleResponse('Accepted')}>
 //                 <CheckIcon color="primary" />
 //               </IconButton>
-//               <IconButton onClick={() => handleResponse('Rejected')}>
+//               <IconButton
+//                 onClick={() => {
+//                   handleResponse('Rejected');
+//                   handleCloseModal();
+//                 }}
+//               >
 //                 <CloseIcon color="error" />
 //               </IconButton>
 //             </Box>
@@ -239,13 +245,11 @@
 
 
 
-
-
 import { useEffect, useState, useCallback } from 'react'; 
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Box, Typography, CircularProgress, ListItem, ListItemText, Paper, Grid, Select, MenuItem, InputLabel, FormControl, Modal, IconButton } from '@mui/material';
+import { Box, Typography, CircularProgress, ListItem, ListItemText, Paper, Tab, Tabs, Modal, IconButton, Grid } from '@mui/material';
 import { motion } from 'framer-motion';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -254,17 +258,14 @@ const Works = () => {
   const [requestedBookings, setRequestedBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filterStatus, setFilterStatus] = useState('All');
-  const [openModal, setOpenModal] = useState(false); // Modal state
-  const [selectedBooking, setSelectedBooking] = useState(null); // To track the selected booking
-
-  // Get the user and token from the Redux store
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [tabValue, setTabValue] = useState(0);
   const { user, token } = useSelector((state) => state.auth);
-
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
   const fetchBookings = useCallback(async () => {
-    if (!user) return; // Don't fetch if userId is not available
+    if (!user) return;
 
     try {
       const response = await axios.get(`http://localhost:5000/api/bookings/requestedbooking/${user.id}`, {
@@ -272,44 +273,45 @@ const Works = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setRequestedBookings(response.data.bookings || []); // Ensure it's an array
+
+      if (response.data && response.data.bookings) {
+        setRequestedBookings(response.data.bookings);
+      } else {
+        setRequestedBookings([]);
+      }
       setLoading(false);
     } catch (err) {
-      setError(err.message || 'Error fetching bookings');
+      setError(err.message || 'Error fetching bookings' );
       setLoading(false);
     }
-  }, [user, token]); // Add user and token as dependencies
+  }, [user, token]);
 
   useEffect(() => {
     fetchBookings();
   }, [user, token, fetchBookings]);
 
-  // Filter bookings based on the selected status
-  const filteredBookings = requestedBookings.filter(booking => 
-    filterStatus === 'All' || booking.status === filterStatus
-  );
-
-  const getBookingsByStatus = (status) => {
-    return requestedBookings.filter(booking => status.includes(booking.status));
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
   };
 
-  // Handle double-click to open the modal
+  const getBookingsByStatus = (status) => {
+    return requestedBookings.filter(booking => booking.status.toLowerCase() === status.toLowerCase());
+  };
+
   const handleDoubleClick = (booking) => {
     setSelectedBooking(booking);
     setOpenModal(true);
   };
 
-  // Handle double-click on Confirmed status to navigate to another route
   const handleDoubleClickConfirmed = (bookingId) => {
-    navigate(`/verifywork/${bookingId}`); // Navigate to the VerifyWork page with the booking ID
+    navigate(`/verifywork/${bookingId}`);
   };
 
-  // Handle accept or reject task
   const handleResponse = async (responseMessage) => {
     if (!selectedBooking) return;
 
     try {
-      const res = await axios.post('http://localhost:5000/api/bookings/notify', {
+      await axios.post('http://localhost:5000/api/bookings/notify', {
         message: responseMessage,
         bookingId: selectedBooking._id
       }, {
@@ -317,18 +319,17 @@ const Works = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      console.log(res.data); // Handle response
-
-      // Close the modal after submitting the response
       setOpenModal(false);
       setSelectedBooking(null);
-
-      // Re-fetch the bookings to update the UI
       fetchBookings();
     } catch (err) {
       console.log('Error sending response:', err);
     }
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setSelectedBooking(null);
   };
 
   return (
@@ -337,123 +338,127 @@ const Works = () => {
         Requested Bookings
       </Typography>
 
-      {/* Filter Dropdown */}
-      <FormControl fullWidth sx={{ marginBottom: 2 }}>
-        <InputLabel>Status Filter</InputLabel>
-        <Select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          label="Status Filter"
-        >
-          <MenuItem value="All">All</MenuItem>
-          <MenuItem value="Pending">Pending</MenuItem>
-          <MenuItem value="Confirmed">Confirmed</MenuItem>
-          <MenuItem value="Completed">Completed</MenuItem>
-          <MenuItem value="Closed">Closed</MenuItem>
-        </Select>
-      </FormControl>
+      <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" sx={{ padding: 2, maxWidth: 1200, margin: 'auto' }}>
+        <Tab label="Pending" />
+        <Tab label="Confirmed" />
+        <Tab label="Completed" />
+        <Tab label="Closed" />
+      </Tabs>
 
       {loading ? (
         <Box display="flex" justifyContent="center">
           <CircularProgress />
         </Box>
       ) : error ? (
-        <Typography color="error" align="center">{error}</Typography>
-      ) : filteredBookings.length === 0 ? (
-        <Typography align="center">No bookings found.</Typography>
+        <Typography color="error" align="center">No Bookings Found</Typography>
       ) : (
-        <Grid container spacing={2}>
-          {/* Pending Column */}
-          <Grid item xs={12} md={4}>
-            <Typography variant="h6" align="center" gutterBottom>Pending</Typography>
-            {getBookingsByStatus(['Pending']).map((booking) => (
-              <motion.div 
-                key={booking._id}
-                initial={{ opacity: 0, scale: 0.9 }} 
-                animate={{ opacity: 1, scale: 1 }} 
-                transition={{ duration: 0.3 }}
-                onDoubleClick={() => handleDoubleClick(booking)} // Open modal on double-click
-              >
-                <Paper elevation={3} sx={{ margin: 2, padding: 2, borderRadius: 2 }}>
-                  <ListItem>
-                    <ListItemText 
-                      primary={<Typography variant="h6">{booking.userId.name}</Typography>}
-                      secondary={
-                        <>
-                          <Typography variant="body2">Service: {booking.serviceProviderId.serviceName}</Typography>
-                          <Typography variant="body2">Date: {new Date(booking.bookingDate).toLocaleDateString()}</Typography>
-                        </>
-                      }
-                    />
-                  </ListItem>
-                </Paper>
-              </motion.div>
-            ))}
-          </Grid>
-
-          {/* Confirmed Column */}
-          <Grid item xs={12} md={4}>
-            <Typography variant="h6" align="center" gutterBottom>Confirmed</Typography>
-            {getBookingsByStatus(['Confirmed']).map((booking) => (
-              <motion.div 
-                key={booking._id}
-                initial={{ opacity: 0, scale: 0.9 }} 
-                animate={{ opacity: 1, scale: 1 }} 
-                transition={{ duration: 0.3 }}
-               onDoubleClick={() => handleDoubleClickConfirmed(booking._id)} // Navigate to verify work on double-click
-              >
-                <Paper elevation={3} sx={{ margin: 2, padding: 2, borderRadius: 2 }}>
-                  <ListItem>
-                    <ListItemText 
-                      primary={<Typography variant="h6">{booking.userId.name}</Typography>}
-                      secondary={
-                        <>
-                          <Typography variant="body2">Service: {booking.serviceProviderId.serviceName}</Typography>
-                          <Typography variant="body2">Date: {new Date(booking.bookingDate).toLocaleDateString()}</Typography>
-                        </>
-                      }
-                    />
-                  </ListItem>
-                </Paper>
-              </motion.div>
-            ))}
-          </Grid>
-
-          {/* Completed/Closed Column */}
-          <Grid item xs={12} md={4}>
-            <Typography variant="h6" align="center" gutterBottom>Completed / Closed</Typography>
-            {getBookingsByStatus(['Completed', 'Closed']).map((booking) => (
-              <motion.div 
-                key={booking._id}
-                initial={{ opacity: 0, scale: 0.9 }} 
-                animate={{ opacity: 1, scale: 1 }} 
-                transition={{ duration: 0.3 }}
-              >
-                <Paper elevation={3} sx={{ margin: 2, padding: 2, borderRadius: 2 }}>
-                  <ListItem>
-                    <ListItemText 
-                      primary={<Typography variant="h6">{booking.userId.name}</Typography>}
-                      secondary={
-                        <>
-                          <Typography variant="body2">Service: {booking.serviceProviderId.serviceName}</Typography>
-                          <Typography variant="body2">Date: {new Date(booking.bookingDate).toLocaleDateString()}</Typography>
-                        </>
-                      }
-                    />
-                  </ListItem>
-                </Paper>
-              </motion.div>
-            ))}
-          </Grid>
-        </Grid>
+        <>
+          {requestedBookings.length === 0 ? (
+            <Typography color="text.secondary" align="center">No Work Requests by customers.</Typography>
+          ) : (
+            <Grid container spacing={3}>
+              {tabValue === 0 && getBookingsByStatus('Pending').map((booking) => (
+                <Grid item xs={12} sm={6} md={4} lg={4} key={booking._id}>
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }} 
+                    animate={{ opacity: 1, scale: 1 }} 
+                    transition={{ duration: 0.3 }}
+                    onDoubleClick={() => handleDoubleClick(booking)}
+                  >
+                    <Paper elevation={3} sx={{ padding: 2, borderRadius: 2, height: 150 }}>
+                      <ListItem>
+                        <ListItemText 
+                          primary={<Typography variant="h6">{booking.userId.name}</Typography>}
+                          secondary={
+                            <>
+                              <Typography variant="body2">Service: {booking.serviceProviderId.serviceName}</Typography>
+                              <Typography variant="body2">Date: {new Date(booking.bookingDate).toLocaleDateString()}</Typography>
+                            </>
+                          }
+                        />
+                      </ListItem>
+                    </Paper>
+                  </motion.div>
+                </Grid>
+              ))}
+              {tabValue === 1 && getBookingsByStatus('Confirmed').map((booking) => (
+                <Grid item xs={12} sm={6} md={4} lg={4} key={booking._id}>
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }} 
+                    animate={{ opacity: 1, scale: 1 }} 
+                    transition={{ duration: 0.3 }}
+                    onDoubleClick={() => handleDoubleClickConfirmed(booking._id)}
+                  >
+                    <Paper elevation={3} sx={{ padding: 2, borderRadius: 2, height: 150 }}>
+                      <ListItem>
+                        <ListItemText 
+                          primary={<Typography variant="h6">{booking.userId.name}</Typography>}
+                          secondary={
+                            <>
+                              <Typography variant="body2">Service: {booking.serviceProviderId.serviceName}</Typography>
+                              <Typography variant="body2">Date: {new Date(booking.bookingDate).toLocaleDateString()}</Typography>
+                            </>
+                          }
+                        />
+                      </ListItem>
+                    </Paper>
+                  </motion.div>
+                </Grid>
+              ))}
+              {tabValue === 2 && getBookingsByStatus('Completed').map((booking) => (
+                <Grid item xs={12} sm={6} md={4} lg={4} key={booking._id}>
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }} 
+                    animate={{ opacity: 1, scale: 1 }} 
+                    transition={{ duration: 0.3 }}
+                    onDoubleClick={() => handleDoubleClickConfirmed(booking._id)} 
+                  >
+                    <Paper elevation={3} sx={{ padding: 2, borderRadius: 2, height: 150 }}>
+                      <ListItem>
+                        <ListItemText 
+                          primary={<Typography variant="h6">{booking.userId.name}</Typography>}
+                          secondary={
+                            <>
+                              <Typography variant="body2">Service: {booking.serviceProviderId.serviceName}</Typography>
+                              <Typography variant="body2">Date: {new Date(booking.bookingDate).toLocaleDateString()}</Typography>
+                            </>
+                          }
+                        />
+                      </ListItem>
+                    </Paper>
+                  </motion.div>
+                </Grid>
+              ))}
+              {tabValue === 3 && getBookingsByStatus('Closed').map((booking) => (
+                <Grid item xs={12} sm={6} md={4} lg={4} key={booking._id}>
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }} 
+                    animate={{ opacity: 1, scale: 1 }} 
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Paper elevation={3} sx={{ padding: 2, borderRadius: 2, height: 150 }}>
+                      <ListItem>
+                        <ListItemText 
+                          primary={<Typography variant="h6">{booking.userId.name}</Typography>}
+                          secondary={
+                            <>
+                              <Typography variant="body2">Service: {booking.serviceProviderId.serviceName}</Typography>
+                              <Typography variant="body2">Date: {new Date(booking.bookingDate).toLocaleDateString()}</Typography>
+                            </>
+                          }
+                        />
+                      </ListItem>
+                    </Paper>
+                  </motion.div>
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </>
       )}
 
-      {/* Modal for accepting or declining the task */}
       {selectedBooking && (
-        <Modal
-          open={openModal}
-          onClose={() => setOpenModal(false)}
-        >
+        <Modal open={openModal} onClose={handleCloseModal}>
           <Box sx={{ 
             position: 'absolute', 
             top: '50%', 
@@ -471,7 +476,12 @@ const Works = () => {
               <IconButton onClick={() => handleResponse('Accepted')}>
                 <CheckIcon color="primary" />
               </IconButton>
-              <IconButton onClick={() => handleResponse('Rejected')}>
+              <IconButton
+                onClick={() => {
+                  handleResponse('Rejected');
+                  handleCloseModal();
+                }}
+              >
                 <CloseIcon color="error" />
               </IconButton>
             </Box>

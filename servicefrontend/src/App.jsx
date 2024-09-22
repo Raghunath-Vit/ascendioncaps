@@ -18,6 +18,7 @@ import MyBooking from './components/MyBooking';
 import VerifyWork from './components/VerifyWork';
 import OtpEnter from './components/OtpEnter';
 import GiveRating from './components/GiveRating';
+import Register from './components/Register';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -55,8 +56,9 @@ const App = () => {
         <Route path="/verifywork/:id" element={<VerifyWork/>} />
         <Route path='/otpverify/:id' element={<OtpEnter/>} />
         <Route path='/:id/giverating' element={<GiveRating/>} /> 
+        <Route path='/register' element={<Register/>} />
       </Routes>
-
+      
     </>
   );
 };
