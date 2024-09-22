@@ -8,6 +8,8 @@ const userSchema = new mongoose.Schema({
   phoneNumber: { type: String, unique: true, sparse: true },
   googleId: { type: String },
   role: { type: String,  enum: ['user', 'worker', 'admin'], default: 'user' },
+}, {
+  timestamps: true // Enable timestamps to automatically add `createdAt` and `updatedAt`
 });
 
 // Encrypt password before saving

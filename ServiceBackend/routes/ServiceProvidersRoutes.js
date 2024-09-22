@@ -7,7 +7,12 @@ const auth = require('../middlewares/auth');
 const { body, param, validationResult } = require('express-validator');
 
 // Only workers can add ServiceProviderModel
-router.post('/:serviceId/service-providers', auth, async (req, res) => {
+router.post('/:serviceId/service-providers', auth,
+     [
+       body('serviceProviderEmail').isEmail().withMessage('Invalid email address for the service provider.'),
+       body('serviceName').notEmpty().withMessage('Service name is required.'),
+       body('description').notEmpty().withMessage('Description is required.')
+     ], async (req, res) => {
   if (req.user.role !== 'worker') {
     return res.status(403).json({ message: 'Access denied. Only workers can add service providers.' });
   }
@@ -36,6 +41,9 @@ router.post('/:serviceId/service-providers', auth, async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
+
+
 
 // Retrieve all service providers for a service
 router.get('/:serviceId/service-providers', async (req, res) => {

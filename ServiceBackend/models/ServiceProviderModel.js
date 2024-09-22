@@ -25,6 +25,8 @@ const serviceProviderSchema = new mongoose.Schema({
   },
   totalRatingScore: { type: Number, default: 0 }, // Sum of all ratings
   numberOfRatings: { type: Number, default: 0 }, // Count of ratings
+}, {
+  timestamps: true // Enable timestamps to automatically add `createdAt` and `updatedAt`
 });
 
 serviceProviderSchema.methods.updateAverageRating = async function (newRating) {

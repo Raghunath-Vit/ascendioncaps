@@ -17,15 +17,10 @@ const bookingSchema = new mongoose.Schema({
   },
   totalRatingScore: { type: Number, default: 0 }, // Sum of all ratings
   numberOfRatings: { type: Number, default: 0 }, // Count of ratings
+}, {
+  timestamps: true // Enable timestamps to automatically add `createdAt` and `updatedAt`
 });
 
-// Update booking rating
-// bookingSchema.methods.updateRating = async function (newRating) {
-//   this.totalRatingScore += newRating; // Add the new rating to the total score
-//   this.numberOfRatings += 1; // Increment the number of ratings
-//   this.rating = this.totalRatingScore / this.numberOfRatings; // Calculate the average rating
-//   await this.save(); // Save the booking with the updated values
-// };
 
 bookingSchema.methods.updateRating = async function (rating) {
   this.rating = rating;

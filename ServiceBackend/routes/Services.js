@@ -134,26 +134,67 @@ router.delete('/services/:id',
 
 
 // PUT route to update an existing service
-router.put('/:id', auth, async (req, res) => {
-  const { serviceName, description, priceRange } = req.body;
-  try {
-    const service = await Service.findById(req.params.id);
+// router.put('/:id', auth, async (req, res) => {
+//   const { serviceName, description, priceRange } = req.body;
+//   try {
+//     const service = await Service.findById(req.params.id);
 
-    if (!service) {
-      return res.status(404).json({ message: 'Service not found' });
+//     if (!service) {
+//       return res.status(404).json({ message: 'Service not found' });
+//     }
+
+//     // Update the fields that have been changed
+//     if (serviceName) service.serviceName = serviceName;
+//     if (description) service.description = description;
+//     if (priceRange) service.priceRange = priceRange;
+
+//     // Save the updated service
+//     const updatedService = await service.save();
+//     res.status(200).json(updatedService);
+//   } catch (error) {
+//     res.status(500).json({ message: 'Error updating service', error });
+//   }
+// });
+
+// This one is for above 
+// PUT route to update an existing service
+router.put(
+  '/:id',
+  auth,
+  [
+    body('serviceName').optional().notEmpty().withMessage('Service name cannot be empty'),
+    body('description').optional().notEmpty().withMessage('Description cannot be empty'),
+    body('priceRange').optional().isArray().withMessage('Price range must be an array')
+    // Adjust the priceRange validation as per your model requirements
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    // Update the fields that have been changed
-    if (serviceName) service.serviceName = serviceName;
-    if (description) service.description = description;
-    if (priceRange) service.priceRange = priceRange;
+    const { serviceName, description, priceRange } = req.body;
 
-    // Save the updated service
-    const updatedService = await service.save();
-    res.status(200).json(updatedService);
-  } catch (error) {
-    res.status(500).json({ message: 'Error updating service', error });
+    try {
+      const service = await Service.findById(req.params.id);
+
+      if (!service) {
+        return res.status(404).json({ message: 'Service not found' });
+      }
+
+      // Update the fields that have been changed
+      if (serviceName) service.serviceName = serviceName;
+      if (description) service.description = description;
+      if (priceRange) service.priceRange = priceRange;
+
+      // Save the updated service
+      const updatedService = await service.save();
+      res.status(200).json(updatedService);
+    } catch (error) {
+      res.status(500).json({ message: 'Error updating service', error });
+    }
   }
-});
+);
+
 
 module.exports = router;

@@ -335,48 +335,103 @@ router.get('/mybooking/:id', auth, async (req, res) => {
 
 
 // notify customer that service been accepted or decline by the worker
-router.post('/notify', async (req, res) => {
-  const { bookingId, message } = req.body; // Assuming you're passing bookingId and message (Accepted/Declined)
+// router.post('/notify', async (req, res) => {
+//   const { bookingId, message } = req.body; // Assuming you're passing bookingId and message (Accepted/Declined)
   
-  try {
-    // Find the booking by ID
-    const booking = await Booking.findById(bookingId).populate('userId'); // Populate the user to get their phone number
-    if (!booking) {
-      return res.status(404).json({ error: 'Booking not found' });
+//   try {
+//     // Find the booking by ID
+//     const booking = await Booking.findById(bookingId).populate('userId'); // Populate the user to get their phone number
+//     if (!booking) {
+//       return res.status(404).json({ error: 'Booking not found' });
+//     }
+
+//     // Update booking status based on worker's message (Accepted or Declined)
+//     if (message === 'Accepted') {
+//       booking.status = 'Confirmed';
+//     } else if (message === 'Rejected') {
+//       booking.status = 'Closed';
+//     } else {
+//       return res.status(400).json({ error: 'Invalid message. Must be "Accepted" or "Rejected".' });
+//     }
+
+//     // Save the updated booking status
+//     await booking.save();
+
+//     // Notify the customer about the worker's response via Twilio
+//     const { phoneNumber } = booking.userId;
+//     console.log(phoneNumber);
+//     if (!phoneNumber) {
+//       return res.status(400).json({ error: 'User phone number not available' });
+//     }
+
+//     // Send notification via Twilio
+//     await client.messages.create({
+//       body: `Your booking has been ${message} by the worker.`,
+//       from: process.env.TWILIO_PHONE_NUMBER,
+//       to: phoneNumber,
+//     });
+
+//     return res.status(200).json({ message: `Booking ${message} and customer notified successfully`, booking });
+//   } catch (error) {
+//     console.error('Error updating booking status:', error);
+//     return res.status(500).json({ error: 'Failed to update booking status and notify customer' });
+//   }
+// });
+
+
+// Above one with validator
+// Notify customer that service has been accepted or declined by the worker
+router.post(
+  '/notify', 
+  [
+    body('bookingId').isMongoId().withMessage('Invalid booking ID'),
+    body('message').isIn(['Accepted', 'Rejected']).withMessage('Message must be either "Accepted" or "Rejected"'),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    // Update booking status based on worker's message (Accepted or Declined)
-    if (message === 'Accepted') {
-      booking.status = 'Confirmed';
-    } else if (message === 'Rejected') {
-      booking.status = 'Closed';
-    } else {
-      return res.status(400).json({ error: 'Invalid message. Must be "Accepted" or "Rejected".' });
+    const { bookingId, message } = req.body;
+
+    try {
+      // Find the booking by ID
+      const booking = await Booking.findById(bookingId).populate('userId'); // Populate the user to get their phone number
+      if (!booking) {
+        return res.status(404).json({ error: 'Booking not found' });
+      }
+
+      // Update booking status based on worker's message (Accepted or Rejected)
+      if (message === 'Accepted') {
+        booking.status = 'Confirmed';
+      } else if (message === 'Rejected') {
+        booking.status = 'Closed';
+      }
+
+      // Save the updated booking status
+      await booking.save();
+
+      // Notify the customer about the worker's response via Twilio
+      const { phoneNumber } = booking.userId;
+      if (!phoneNumber) {
+        return res.status(400).json({ error: 'User phone number not available' });
+      }
+
+      // Send notification via Twilio
+      await client.messages.create({
+        body: `Your booking has been ${message} by the worker.`,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        to: phoneNumber,
+      });
+
+      return res.status(200).json({ message: `Booking ${message} and customer notified successfully`, booking });
+    } catch (error) {
+      console.error('Error updating booking status:', error);
+      return res.status(500).json({ error: 'Failed to update booking status and notify customer' });
     }
-
-    // Save the updated booking status
-    await booking.save();
-
-    // Notify the customer about the worker's response via Twilio
-    const { phoneNumber } = booking.userId;
-    console.log(phoneNumber);
-    if (!phoneNumber) {
-      return res.status(400).json({ error: 'User phone number not available' });
-    }
-
-    // Send notification via Twilio
-    await client.messages.create({
-      body: `Your booking has been ${message} by the worker.`,
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to: phoneNumber,
-    });
-
-    return res.status(200).json({ message: `Booking ${message} and customer notified successfully`, booking });
-  } catch (error) {
-    console.error('Error updating booking status:', error);
-    return res.status(500).json({ error: 'Failed to update booking status and notify customer' });
   }
-});
+);
 
 
 router.get('/requestedbooking/:id', auth, async (req, res) => {
