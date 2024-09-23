@@ -37,6 +37,7 @@ const Navbar = () => {
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
   const handleLogout = () => {
+    toggleDrawer(false)
     dispatch(logoutUser());
     navigate("/login");
   };
@@ -49,15 +50,15 @@ const Navbar = () => {
     <>
       {user && user.role === "admin" && (
         <>
-          <ListItem button component={Link} to="/create-category">
+          <ListItem button component={Link} to="/create-category"  onClick={toggleDrawer(false)}>
             <CategoryIcon sx={{ marginRight: 1 }} />
             <ListItemText primary="Category" />
           </ListItem>
-          <ListItem button component={Link} to="/create-service">
+          <ListItem button component={Link} to="/create-service"  onClick={toggleDrawer(false)}>
             <ServiceIcon sx={{ marginRight: 1 }} />
             <ListItemText primary="Service" />
           </ListItem>
-          <ListItem button component={Link} to="/view-users">
+          <ListItem button component={Link} to="/view-users"  onClick={toggleDrawer(false)}>
             <ManageIcon sx={{ marginRight: 1 }} />
             <ListItemText primary="Manage" />
           </ListItem>
@@ -67,12 +68,12 @@ const Navbar = () => {
       {user && user.role === "worker" && (
         <>
           <Grid item>
-            <Button color="inherit" component={Link} to="/create-service">
+            <Button color="inherit" component={Link} to="/create-service"  onClick={toggleDrawer(false)}>
               <ServiceIcon sx={{ marginRight: 1 }} /> Add Service
             </Button>
           </Grid>
           <Grid item>
-            <Button color="inherit" component={Link} to="/works">
+            <Button color="inherit" component={Link} to="/works"  onClick={toggleDrawer(false)}>
               <BookIcon sx={{ marginRight: 1 }} /> Your Works
             </Button>
           </Grid>
@@ -86,7 +87,7 @@ const Navbar = () => {
       {user && user.role === "user" && (
         <>
           <Grid item>
-            <Button color="inherit" component={Link} to="/create-service">
+            <Button color="inherit" component={Link} to="/create-service"  onClick={toggleDrawer(false)}>
               <ServiceIcon sx={{ marginRight: 1 }} /> Services
             </Button>
           </Grid>
@@ -94,7 +95,7 @@ const Navbar = () => {
             <Button
               color="inherit"
               component={Link}
-              to={`/mybooking/${user.id}`}
+              to={`/mybooking/${user.id}`}  onClick={toggleDrawer(false)}
             >
               <BookIcon sx={{ marginRight: 1 }} /> My Bookings
             </Button>
@@ -112,10 +113,10 @@ const Navbar = () => {
     <AppBar
       position="static"
       sx={{
-        bgcolor: "#6a1b9a",
+        bgcolor: "#413f75",
         width: "100%",
         paddingX: { xs: 2, sm: 4 },
-        paddingY: 1,
+        
       }}
     >
       <Toolbar
@@ -123,7 +124,7 @@ const Navbar = () => {
           width: "100%",
           maxWidth: "1200px",
           marginX: "auto",
-          paddingY: { xs: 1, sm: 2 },
+          paddingY: { xs: 1, sm: 1.5 },
         }}
       >
         <Box
@@ -304,3 +305,5 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+

@@ -4,10 +4,10 @@ import {jwtDecode} from 'jwt-decode';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILURE = 'LOGIN_FAILURE';
 export const LOGOUT = 'LOGOUT';
-export const CLEAR_ERROR = 'CLEAR_ERROR'; // Add this constant
+export const CLEAR_ERROR = 'CLEAR_ERROR'; 
 
 
-export const clearError = () => ({ // Add this action
+export const clearError = () => ({ 
   type: CLEAR_ERROR,
 });
 

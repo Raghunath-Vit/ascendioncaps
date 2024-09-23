@@ -6,23 +6,22 @@ import BuildIcon from '@mui/icons-material/Build';
 import GroupIcon from '@mui/icons-material/Group';
 import { motion } from 'framer-motion';
 
-// Styled card with hover effect
+
 const StyledCard = styled(Card)(({ theme }) => ({
   transition: 'transform 0.3s, box-shadow 0.3s',
-  display: 'flex', // Make the card a flex container
-  flexDirection: 'column', // Ensure content flows vertically
-  justifyContent: 'space-between', // Ensure the button stays at the bottom
-  height: '100%', // Card should stretch to fill available height
+  display: 'flex', 
+  flexDirection: 'column', 
+  justifyContent: 'space-between', 
+  height: '100%', 
   '&:hover': {
     transform: 'translateY(-8px)',
-    boxShadow: theme.shadows[4] || '0px 4px 20px rgba(0, 0, 0, 0.1)', // Fallback shadow
+    boxShadow: theme.shadows[4] || '0px 4px 20px rgba(0, 0, 0, 0.1)',
   },
 }));
 
-// Global body background style
 const globalStyle = {
   minHeight: '100vh',
-  backgroundColor: '#fff', // Light grey background to match Material UI design
+  backgroundColor: '#fff', 
 };
 const AdminPage = () => {
   return (
@@ -55,7 +54,7 @@ const AdminPage = () => {
           </StyledCard>
         </Grid>
 
-        {/* Service Card */}
+       
         <Grid item xs={12} sm={6} md={4} display="flex">
           <StyledCard component={motion.div} whileHover={{ scale: 1.05 }}>
             <CardContent sx={{ flexGrow: 1 }}>
@@ -81,7 +80,7 @@ const AdminPage = () => {
           </StyledCard>
         </Grid>
 
-        {/* Users Card */}
+       
         <Grid item xs={12} sm={6} md={4} display="flex">
           <StyledCard component={motion.div} whileHover={{ scale: 1.05 }}>
             <CardContent sx={{ flexGrow: 1 }}>

@@ -1,7 +1,6 @@
-
-import { useState, useEffect } from 'react';  
+import { useState, useEffect } from 'react';   
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser,clearError } from '../redux/actions';
+import { loginUser, clearError } from '../redux/actions';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { Container, TextField, Button, Typography, Box, Snackbar, CircularProgress, Link } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -25,16 +24,16 @@ const Login = () => {
   useEffect(() => {
     if (user) {
       setLoading(false);
-      navigate(user.role === 'admin' ? '/admin' : user.role === 'worker' ? '/worker' : '/user');
+      navigate(user.role === 'admin' ? '/admin' : user.role === 'worker' ? '/create-service' : '/create-service');
     } if (error) {
-      setLoading(false);  // Stop loading when there is an error
-      setSnackbarOpen(true);  // Open the snackbar to display error message
+      setLoading(false);  
+      setSnackbarOpen(true);  
     }
-  }, [user,error,navigate]);
+  }, [user, error, navigate]);
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
-    dispatch(clearError()); // Clear the error in Redux when Snackbar closes
+    dispatch(clearError()); 
   };
 
   return (
@@ -44,8 +43,8 @@ const Login = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        bgcolor: '#f3e5f5',
-         minHeight: '600px',
+        bgcolor: '#f3e5f5', 
+        minHeight: '600px',
       }}
     >
       <Container
@@ -55,16 +54,16 @@ const Login = () => {
         exit={{ opacity: 0, scale: 0.8 }}
         maxWidth="xs"
         sx={{
-          bgcolor: '#fafafa',
+          bgcolor: '#fafafa', 
           borderRadius: 2,
           boxShadow: 3,
           p: 4,
           display: 'flex',
           flexDirection: 'column',
-          marginBottom:'7rem'
+          marginBottom: '7rem',
         }}
       >
-        <Typography variant="h4" align="center" sx={{ mb: 2, color: '#6a1b9a' }}>
+        <Typography variant="h4" align="center" sx={{ mb: 2, color: '#2c2c54' }}>
           Welcome Back
         </Typography>
         <form onSubmit={handleSubmit}>
@@ -78,18 +77,18 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
               InputProps={{
-                startAdornment: <EmailIcon sx={{ color: '#6a1b9a', mr: 1 }} />,
+                startAdornment: <EmailIcon sx={{ color: '#2c2c54', mr: 1 }} />,  
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
-                    borderColor: '#6a1b9a',
+                    borderColor: '#2c2c54', 
                   },
                   '&:hover fieldset': {
-                    borderColor: '#6a1b9a',
+                    borderColor: '#f4b400', 
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#6a1b9a',
+                    borderColor: '#f4b400',  
                   },
                 },
               }}
@@ -106,18 +105,18 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               InputProps={{
-                startAdornment: <LockIcon sx={{ color: '#6a1b9a', mr: 1 }} />,
+                startAdornment: <LockIcon sx={{ color: '#2c2c54', mr: 1 }} />,  
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
-                    borderColor: '#6a1b9a',
+                    borderColor: '#2c2c54', 
                   },
                   '&:hover fieldset': {
-                    borderColor: '#6a1b9a',
+                    borderColor: '#f4b400', 
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#6a1b9a',
+                    borderColor: '#f4b400',  
                   },
                 },
               }}
@@ -131,9 +130,10 @@ const Login = () => {
             type="submit"
             disabled={loading}
             sx={{
-              bgcolor: '#6a1b9a',
+              bgcolor: '#2c2c54', 
+              color: '#ffffff',   
               '&:hover': {
-                bgcolor: '#4e0e6c',
+                bgcolor: '#3c3c7b',  
               },
               boxShadow: 2,
             }}
@@ -154,10 +154,9 @@ const Login = () => {
             </Button>
           }
         />
-       
-        <Typography align="center" sx={{ mt: 2 }}>
+        <Typography align="center" sx={{ mt: 2, color:"3c3c7b" }}>
           Don't have an account?{' '}
-          <Link component={RouterLink} to="/register" sx={{ color: '#6a1b9a', fontWeight: 'bold' }}>
+          <Link component={RouterLink} to="/register" sx={{ color: '#f4b400', fontWeight: 'bold',textDecoration:"none" }}>  
             Register
           </Link>
         </Typography>
@@ -167,3 +166,4 @@ const Login = () => {
 };
 
 export default Login;
+

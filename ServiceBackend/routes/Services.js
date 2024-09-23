@@ -58,7 +58,7 @@ router.post('/services',
         categoryId, 
         serviceName, 
         description, 
-        serviceProviderId: [] // Empty array, can be updated later
+        serviceProviderId: [] 
       });
       await service.save();
 

@@ -10,38 +10,36 @@ import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-// import useMediaQuery from '@mui/material/useMediaQuery';
+
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-// Custom theme with updated color palette
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#6a1b9a', // purple
+      main: '#6a1b9a', 
     },
     secondary: {
-      main: '#d1c4e9', // light purple
+      main: '#d1c4e9', 
     },
     error: {
-      main: '#f44336', // red
+      main: '#f44336', 
     },
     background: {
-      default: '#fafafa', // light grey
+      default: '#fafafa', 
     },
   },
 });
 
-// Styled card for categories with proper background and text color
 const StyledCard = styled(motion(Card))(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper, // Light grey from theme for card background
-  color: theme.palette.primary.main, // Text color will use the primary color (purple)
+  backgroundColor: theme.palette.background.paper, 
+  color: theme.palette.primary.main,
   transition: 'transform 0.3s, box-shadow 0.3s',
   boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
   '&:hover': {
     transform: 'translateY(-8px)',
-    boxShadow: theme.shadows[4], // Slight elevation on hover
+    boxShadow: theme.shadows[4], 
   },
-  position: 'relative', // For positioning the delete icon
+  position: 'relative',
 }));
 
 const CreateCategory = () => {
@@ -50,13 +48,13 @@ const CreateCategory = () => {
   const [categoryName, setCategoryName] = useState('');
   const [categoryDescription, setCategoryDescription] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [deleteCategoryId, setDeleteCategoryId] = useState(null); // Holds the id of category to delete
-  const [openDeleteModal, setOpenDeleteModal] = useState(false); // Controls the delete modal visibility
+  const [deleteCategoryId, setDeleteCategoryId] = useState(null); 
+  const [openDeleteModal, setOpenDeleteModal] = useState(false); 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const token = useSelector((state) => state.auth.token);
-  // const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  
 
   useEffect(() => {
     axios.get('http://localhost:5000/api/categories').then((response) => {
@@ -106,14 +104,14 @@ const CreateCategory = () => {
 
 
   const handleDeleteClick = (categoryId) => {
-    console.log('Selected categoryId:', categoryId); // Check the ID being passed
+    console.log('Selected categoryId:', categoryId); 
     setDeleteCategoryId(categoryId);
     setOpenDeleteModal(true);
   };
   
 
   const handleDeleteCategory = async () => {
-    console.log('Deleting category with id:', deleteCategoryId); // Check the value before sending the request
+    console.log('Deleting category with id:', deleteCategoryId);
     try {
       await axios.delete(`http://localhost:5000/api/delcategory/${deleteCategoryId}`, {
         headers: {
@@ -121,11 +119,10 @@ const CreateCategory = () => {
         },
       });
   
-      // Remove the deleted category from the state
       const updatedCategories = categories.filter((category) => category._id !== deleteCategoryId);
       setCategories(updatedCategories);
       setFilteredCategories(updatedCategories);
-      setOpenDeleteModal(false); // Close the modal after deletion
+      setOpenDeleteModal(false); 
       setOpenDeleteModal(false);
       setSnackbarMessage('Category deleted successfully!');
       setSnackbarOpen(true);
@@ -150,7 +147,7 @@ const CreateCategory = () => {
           transition={{ duration: 0.5 }}
         >
           <Grid container spacing={4} justifyContent="center">
-            {/* Add Category Form - Centered */}
+            
             <Grid item xs={12} md={6}>
               <Box
                 display="flex"
@@ -208,12 +205,12 @@ const CreateCategory = () => {
               </Box>
             </Grid>
 
-            {/* Divider */}
+            
             <Grid item xs={12}>
               <Divider sx={{ my: 4 }} />
             </Grid>
 
-            {/* Search and Category List */}
+           
             <Grid item xs={12} mb={4}>
               <TextField
                 label="Search Categories"
@@ -232,18 +229,17 @@ const CreateCategory = () => {
               />
               <Grid container spacing={3}>
                 {filteredCategories.map((category) => (
-                   // Log to check the structure
+                  
                   <Grid item xs={12} sm={6} md={4} key={category._id}>
                     <StyledCard whileHover={{ scale: 1.05 }}>
                       <CardContent>
-                        <Typography variant="h6" color="primary"> {/* Primary color for the card title */}
+                        <Typography variant="h6" color="primary"> 
                           {category.name}
                         </Typography>
-                        <Typography variant="body2" color="textSecondary"> {/* Default text color */}
+                        <Typography variant="body2" color="textSecondary"> 
                           {category.description}
                         </Typography>
 
-                        {/* Delete Icon */}
                         <IconButton
                           onClick={() => handleDeleteClick(category._id)}
                           sx={{ position: 'absolute', top: 8, right: 8, color: theme.palette.error.main }}
@@ -257,9 +253,7 @@ const CreateCategory = () => {
               </Grid>
             </Grid>
           </Grid>
-        {/* </motion.div> */}
-
-        {/* Delete Confirmation Modal */}
+      
         <Dialog
           open={openDeleteModal}
           onClose={() => setOpenDeleteModal(false)}
@@ -280,7 +274,7 @@ const CreateCategory = () => {
           </DialogActions>
         </Dialog>
 
-         {/* Snackbar for notifications */}
+        
          <Snackbar
             open={snackbarOpen}
             autoHideDuration={6000}

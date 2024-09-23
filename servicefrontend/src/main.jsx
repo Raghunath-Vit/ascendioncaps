@@ -16,7 +16,7 @@ const theme = createTheme({
     '0px 3px 6px rgba(0, 0, 0, 0.16), 0px 3px 6px rgba(0, 0, 0, 0.23)', // shadow[2]
     '0px 3px 10px rgba(0, 0, 0, 0.20), 0px 3px 10px rgba(0, 0, 0, 0.22)', // shadow[3]
     '0px 5px 15px rgba(0, 0, 0, 0.2)', // shadow[4]
-    // Add more shadows up to 24
+    
   ],
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',

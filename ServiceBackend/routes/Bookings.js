@@ -20,10 +20,8 @@ const agent = new https.Agent({
   rejectUnauthorized: false,
 });
 
-// Configure Twilio client
 const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
 
-// Error handling middleware
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -130,7 +128,6 @@ router.post(
       const booking = await Booking.findById(req.params.id);
       if (!booking) return res.status(404).json({ error: 'Booking not found' });
 
-      // Check if both files were uploaded
       const beforeWorking = req.files['beforeWorking'] ? req.files['beforeWorking'][0].path : null;
       const afterWorking = req.files['afterWorking'] ? req.files['afterWorking'][0].path : null;
 
@@ -138,14 +135,12 @@ router.post(
         return res.status(400).json({ error: 'Both beforeWorking and afterWorking files are required' });
       }
 
-      // Save the file paths and mark booking as completed
       booking.beforeWorking = beforeWorking;
       booking.afterWorking = afterWorking;
       booking.status = 'Completed';
       await booking.save();
 
-      // Call sendOtp function after booking is saved
-      const otpResponse = await sendOtp({ bookingId: booking._id }); // Only pass bookingId
+      const otpResponse = await sendOtp({ bookingId: booking._id }); 
 
       res.json({ message: 'Booking completed with proof images and OTP sent', booking, otpResponse });
     } catch (error) {
@@ -156,39 +151,32 @@ router.post(
 );
 
 const sendOtp = async ({ bookingId }) => {
-  // Find the booking by ID
-  const booking = await Booking.findById(bookingId).populate('userId'); // Populate the user data
+  const booking = await Booking.findById(bookingId).populate('userId');
   if (!booking) {
     throw new Error('Booking not found');
   }
 
-  // Get the phoneNumber from the populated userId field
   const { phoneNumber } = booking.userId;
   if (!phoneNumber) {
     throw new Error('User does not have a phone number');
   }
 
-  // Generate a random 6-digit OTP
   const otp = Math.floor(100000 + Math.random() * 900000);
 
-  // Construct the Google Form link with the OTP
   const googleFormLink = `http://localhost:5173/${bookingId}/giverating`;
 
-  // Send OTP via Twilio
   await client.messages.create({
     body: `Your OTP is ${otp}. Please provide feedback using this link: ${googleFormLink}`,
     from: process.env.TWILIO_PHONE_NUMBER,
     to: phoneNumber,
   });
 
-  // Save the OTP in the booking record
   booking.otp = otp;
   await booking.save();
 
   return { message: 'OTP and Google Form link sent and saved', booking };
 };
 
-// Verify OTP to close the booking
 router.post('/bookings/:id/verify-otp', verifyOtp);
 
 // Rate a booking and service
@@ -238,24 +226,19 @@ router.post(
     const bookingId = req.params.id;
 
     try {
-      // Find the booking
       const booking = await Booking.findById(bookingId).populate('serviceProviderId');
       if (!booking) return res.status(404).json({ error: 'Booking not found' });
 
-      // Ensure the booking status is 'Completed' or 'Closed'
       if (booking.status !== 'Completed' && booking.status !== 'Closed' && booking.status !== 'Confirmed' ) {
         return res.status(400).json({ error: 'Cannot rate a service that is not confirmed,completed or closed' });
       }
 
-      // Update the booking's rating
       booking.rating = rating;
       await booking.save();
 
-      // Update the service's average rating
       const service = await ServiceProvider.findById(booking.serviceProviderId);
       if (!service) return res.status(404).json({ error: 'Service not found' });
 
-      // Recalculate the service's average rating
       const bookingsWithRatings = await Booking.find({ serviceId: service._id, rating: { $exists: true } });
       const totalRatings = bookingsWithRatings.reduce((acc, booking) => acc + booking.rating, 0);
       service.averageRating = totalRatings / bookingsWithRatings.length;
@@ -288,7 +271,6 @@ router.get('/:id/rate', async (req, res) => {
 });
 
 
-// Get all bookings
 router.get('/', auth, async (req, res) => {
   try {
     const bookings = await Booking.find()
@@ -306,11 +288,10 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// Get booking details by user ID
 router.get('/mybooking/:id', auth, async (req, res) => {
   try {
-    const userId = req.params.id; // This should contain the user ID from the URL
-    console.log('Fetching bookings for user ID:', userId); // Debugging line
+    const userId = req.params.id; 
+    console.log('Fetching bookings for user ID:', userId); 
 
     if (!userId) {
       return res.status(400).json({ message: 'User ID is required' });
@@ -396,29 +377,25 @@ router.post(
     const { bookingId, message } = req.body;
 
     try {
-      // Find the booking by ID
-      const booking = await Booking.findById(bookingId).populate('userId'); // Populate the user to get their phone number
+      
+      const booking = await Booking.findById(bookingId).populate('userId'); 
       if (!booking) {
         return res.status(404).json({ error: 'Booking not found' });
       }
 
-      // Update booking status based on worker's message (Accepted or Rejected)
       if (message === 'Accepted') {
         booking.status = 'Confirmed';
       } else if (message === 'Rejected') {
         booking.status = 'Closed';
       }
 
-      // Save the updated booking status
       await booking.save();
 
-      // Notify the customer about the worker's response via Twilio
       const { phoneNumber } = booking.userId;
       if (!phoneNumber) {
         return res.status(400).json({ error: 'User phone number not available' });
       }
 
-      // Send notification via Twilio
       await client.messages.create({
         body: `Your booking has been ${message} by the worker.`,
         from: process.env.TWILIO_PHONE_NUMBER,
@@ -434,44 +411,81 @@ router.post(
 );
 
 
+// router.get('/requestedbooking/:id', auth, async (req, res) => {
+//   try {
+//     const userId = req.params.id; 
+
+//     if (!userId) {
+//       return res.status(400).json({ message: 'User ID is required' });
+//     }
+
+//     const serviceProvider = await ServiceProvider.findOne({ userId });
+
+//     if (!serviceProvider) {
+//       return res.status(404).json({ message: 'No service provider found for this user' });
+//     }
+
+//     const serviceProviderId = serviceProvider._id;  
+
+//     const bookings = await Booking.find({ serviceProviderId })
+//       .populate({
+//         path: 'userId',  
+//         select: 'name email phoneNumber', 
+//       })
+//       .populate({
+//         path: 'serviceProviderId',  
+//         populate: { path: 'userId', select: 'name' }  
+//       });
+
+//     if (!bookings || bookings.length === 0) {
+//       return res.status(404).json({ message: 'No bookings found for this service provider' });
+//     }
+
+//     res.json({ bookings });
+//   } catch (error) {
+//     console.error('Error fetching bookings for service provider:', error);
+//     res.status(500).json({ error: 'Error fetching bookings' });
+//   }
+// });
+
 router.get('/requestedbooking/:id', auth, async (req, res) => {
   try {
-    const userId = req.params.id;  // This is the userId from the request
+    const userId = req.params.id; 
 
     if (!userId) {
       return res.status(400).json({ message: 'User ID is required' });
     }
 
-    // Find the service provider associated with this userId
-    const serviceProvider = await ServiceProvider.findOne({ userId });
+    const serviceProviders = await ServiceProvider.find({ userId });
 
-    if (!serviceProvider) {
-      return res.status(404).json({ message: 'No service provider found for this user' });
+    if (!serviceProviders || serviceProviders.length === 0) {
+      return res.status(404).json({ message: 'No service providers found for this user' });
     }
 
-    const serviceProviderId = serviceProvider._id;  // Get the service provider's ID
+    // Extracting service provider IDs from the results
+    const serviceProviderIds = serviceProviders.map(provider => provider._id);  
 
-    // Fetch all bookings for the found service provider
-    const bookings = await Booking.find({ serviceProviderId })
+    const bookings = await Booking.find({ serviceProviderId: { $in: serviceProviderIds } })
       .populate({
-        path: 'userId',  // Populate user details
-        select: 'name email phoneNumber',  // Only get required user info
+        path: 'userId',  
+        select: 'name email phoneNumber', 
       })
       .populate({
-        path: 'serviceProviderId',  // Populate the service provider details
-        populate: { path: 'userId', select: 'name' }  // Populate worker's details
+        path: 'serviceProviderId',  
+        populate: { path: 'userId', select: 'name' }  
       });
 
     if (!bookings || bookings.length === 0) {
-      return res.status(404).json({ message: 'No bookings found for this service provider' });
+      return res.status(404).json({ message: 'No bookings found for these service providers' });
     }
 
     res.json({ bookings });
   } catch (error) {
-    console.error('Error fetching bookings for service provider:', error);
+    console.error('Error fetching bookings for service providers:', error);
     res.status(500).json({ error: 'Error fetching bookings' });
   }
 });
+
 
 
 

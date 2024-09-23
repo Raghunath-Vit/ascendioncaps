@@ -1,4 +1,4 @@
-/* Base styles for the navbar */
+
 nav {
   background-color: #333;
   color: white;
@@ -38,7 +38,7 @@ ul li input {
   margin-left: 1rem;
 }
 
-/* Button styles */
+
 button {
   padding: 0.5rem 1rem;
   background-color: #f44336;
@@ -52,7 +52,7 @@ button:hover {
   background-color: #e53935;
 }
 
-/* Responsive styles */
+
 @media (max-width: 768px) {
   nav {
     flex-direction: column;

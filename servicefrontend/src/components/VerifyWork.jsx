@@ -124,9 +124,9 @@ const VerifyWork = () => {
               fullWidth
               disabled={loading}
               sx={{
-                bgcolor: '#8e44ad', // Default background color
+                bgcolor: '#8e44ad', 
                 '&:hover': {
-                  bgcolor: '#6a1b9a', // Background color on hover
+                  bgcolor: '#6a1b9a', 
                 },
               }}
             >

@@ -318,18 +318,6 @@ const CreateService = () => {
         </Box>
       </Modal>
 
-      {/* Confirmation Delete Modal
-      <Modal open={confirmDeleteModal} onClose={handleDeleteCancel}>
-        <Box sx={confirmDeleteModalStyles}>
-          <Typography variant="h6" gutterBottom color="#f44336">Delete Service</Typography>
-          <Typography variant="body2">Are you sure you want to delete "{deleteServiceName}"?</Typography>
-          <Grid container justifyContent="space-between" sx={{ marginTop: 2 }}>
-            <Button variant="outlined" onClick={handleDeleteCancel}>Cancel</Button>
-            <Button variant="contained" color="error" onClick={handleDeleteConfirm}>Delete</Button>
-          </Grid>
-        </Box> */}
-        
-      {/* Confirm Delete Modal */}
        <Modal open={confirmDeleteModal} onClose={handleDeleteCancel}>
          <Box sx={confirmDeleteModalStyles}>
            <Typography variant="h6" gutterBottom color="#6a1b9a">Are you sure you want to delete the service "{deleteServiceName}"?</Typography>
@@ -344,7 +332,7 @@ const CreateService = () => {
          </Box>
       </Modal>
 
-      {/* Snackbar for messages */}
+     
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}
@@ -366,7 +354,7 @@ const CreateService = () => {
     </Container>
   );
 };
-// // Styles
+
 const modalBoxStyles = {
   position: 'absolute',
   top: '60%',

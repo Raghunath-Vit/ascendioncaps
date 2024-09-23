@@ -1,4 +1,4 @@
-// import React from 'react';
+
 import { useDispatch } from 'react-redux';
 import { logoutUser } from '../redux/actions';
 import { useNavigate } from 'react-router-dom';
@@ -15,7 +15,7 @@ const Worker = () => {
   return (
     <div>
       <h1>Worker Dashboard</h1>
-      {/* Add your worker-specific content here */}
+     
       <button onClick={handleLogout}>Logout</button>
     </div>
   );

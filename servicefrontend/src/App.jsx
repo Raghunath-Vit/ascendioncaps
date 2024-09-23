@@ -19,6 +19,7 @@ import VerifyWork from './components/VerifyWork';
 import OtpEnter from './components/OtpEnter';
 import GiveRating from './components/GiveRating';
 import Register from './components/Register';
+import Footer from './components/Footer';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -42,6 +43,7 @@ const App = () => {
     <Navbar/>
    
       <Routes>
+      <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/worker" element={<Worker />} />
@@ -58,7 +60,7 @@ const App = () => {
         <Route path='/:id/giverating' element={<GiveRating/>} /> 
         <Route path='/register' element={<Register/>} />
       </Routes>
-      
+      <Footer/>
     </>
   );
 };

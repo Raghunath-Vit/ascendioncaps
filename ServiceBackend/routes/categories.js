@@ -45,10 +45,9 @@ router.post('/categories',
     }
 );
 
-// Fetch all Categories
 router.get('/categories', async (req, res) => {
     try {
-        const categories = await Category.find(); // Fetch all categories from the DB
+        const categories = await Category.find(); 
         res.status(200).json(categories);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -56,7 +55,6 @@ router.get('/categories', async (req, res) => {
 });
 
 
-// Delete a Category by ID (Admin only)
 router.delete('/delcategory/:id', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'admin') {
         return res.status(403).json({ message: 'Access denied. Only admins can delete categories.' });

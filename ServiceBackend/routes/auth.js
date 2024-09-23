@@ -3,7 +3,6 @@ const express = require('express');
 const passport = require('passport');
 const twilio = require('twilio');
 const jwt = require('jsonwebtoken');
- // express-validator for validation
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const router = express.Router();
@@ -13,9 +12,8 @@ const auth=require('../middlewares/auth');
 
 dotenv.config()
 
-// Create a custom HTTPS agent
 const agent = new https.Agent({
-  rejectUnauthorized: false, // Bypass SSL verification
+  rejectUnauthorized: false, 
 });
 
 const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN, {
@@ -35,7 +33,7 @@ router.post(
     }
 
     const { phoneNumber } = req.body;
-    const otp = Math.floor(100000 + Math.random() * 900000); // Generate random 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000); 
 
     try {
       const message = await client.messages.create({
@@ -46,19 +44,18 @@ router.post(
 
       console.log('Twilio message sent:', message);
 
-      // Save OTP in session or database for future verification
+      
       req.session.otp = otp;
       req.session.phoneNumber = phoneNumber;
 
       res.json({ message: 'OTP sent successfully' });
     } catch (error) {
-      console.error('Error sending OTP:', error); // Log the Twilio error
+      console.error('Error sending OTP:', error); 
       res.status(500).json({ error: 'Error sending OTP', details: error.message });
     }
   }
 );
 
-// Verify OTP Route
 router.post(
   '/otp/verify',
   body('otp').isLength({ min: 6, max: 6 }).withMessage('Invalid OTP').trim().escape(),
@@ -86,7 +83,6 @@ router.post(
   }
 );
 
-// Register User Route
 router.post(
   '/register',
   [
@@ -116,7 +112,6 @@ router.post(
   }
 );
 
-// Register Worker Route
 router.post(
   '/register-worker',
   [
@@ -148,7 +143,6 @@ router.post(
 
 
 
-// Register Admin Route
 router.post(
   '/register-admin',
   [
@@ -180,7 +174,6 @@ router.post(
 
 
 
-// Login Route
 router.post(
   '/login',
   [
@@ -190,7 +183,7 @@ router.post(
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log(errors.array()); // Log the validation errors
+      console.log(errors.array()); 
       return res.status(400).json({ errors: errors.array() });
     }
 
@@ -209,7 +202,6 @@ router.post(
 
 
 
-      // const payload={ id: user._id, role: user.role,}
       const payload = { id: user._id, role: user.role };
 
       const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -242,13 +234,11 @@ router.delete('/deleteuser/:id', auth, async (req, res) => {
   try {
     const userId = req.params.id;
 
-    // Check if the user exists
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Delete the user
     await User.findByIdAndDelete(userId);
     
     res.status(200).json({ message: 'User deleted successfully' });

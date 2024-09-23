@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Container, Typography, Box, Card, CardContent, Divider, TextField, MenuItem, Grid, Alert } from '@mui/material';
 import { useSelector } from 'react-redux';
@@ -160,72 +159,7 @@ const MyBooking = () => {
       </Box>
 
       <Grid container spacing={3}>
-        {/* {filteredBookings.length > 0 ? (
-          filteredBookings.map((booking, index) => (
-            <Grid item xs={12} md={6} lg={4} key={booking._id}>
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-              >
-                <Card
-                  sx={{
-                    maxWidth: 400,
-                    margin: 'auto',
-                    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-                    transition: 'transform 0.2s',
-                    '&:hover': { transform: 'scale(1.05)' },
-                    background: '#fff',
-                    borderRadius: '12px',
-                  }}
-                  onClick={() => handleCardClick(booking)}
-                >
-                  <CardContent>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#37474f' }}>
-                      Service Provider: {booking.serviceProviderId.userId.name}
-                    </Typography>
-                    <Typography variant="body1" color="textSecondary" gutterBottom>
-                      {booking.serviceProviderId.serviceName}
-                    </Typography>
-
-                    <Divider sx={{ my: 2 }} />
-
-                    <Typography variant="body1" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <EmailIcon sx={{ color: '#1976d2' }} /> {booking.serviceProviderId.userId.email}
-                    </Typography>
-                    <Typography variant="body1" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <PhoneIcon sx={{ color: '#388e3c' }} /> {booking.serviceProviderId.userId.phoneNumber}
-                    </Typography>
-
-                    <Divider sx={{ my: 2 }} />
-
-                    <Typography variant="body1" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <EventAvailableIcon sx={{ color: '#f57c00' }} /> Booking Date: {new Date(booking.bookingDate).toLocaleDateString()}
-                    </Typography>
-
-                    <Typography variant="body1" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      Rating: {ratings[booking._id] !== undefined ? (
-                        <ReactStars
-                          count={5}
-                          value={ratings[booking._id]}
-                          size={24}
-                          edit={false}
-                          activeColor="#ffd700"
-                        />
-                      ) : 'Not rated yet'}
-                    </Typography>
-
-                    <Typography variant="body1" sx={{ color: 'gray' }}>
-                      Status: <span style={{ color: booking.status === 'Confirmed' ? 'green' : booking.status === 'Pending' ? 'orange' : booking.status === 'Completed' ? 'green' :'red' }}>{booking.status}</span>
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </Grid>
-          ))
-        ) : (
-          <Typography variant="h6" align="center">No bookings found.</Typography>
-        )} */}
+      
         {filteredBookings.length > 0 ? (
   filteredBookings.map((booking, index) => {
     const serviceProvider = booking.serviceProviderId;
